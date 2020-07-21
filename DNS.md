@@ -28,5 +28,7 @@
 * 관용적으로 쓰는 zone 파일명
     - .zone, .rev
 
+### 외부 호출과 내부 호출을 나누어서 DNS 서버 구성 가능(bind)
 
-
+`dig @10.0.2.20 test.com axfr`
+* Zone Trasfer 전송 옵션
