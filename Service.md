@@ -54,8 +54,8 @@
 `dig @70.12.113.74 test.com +trace`
 * 순환 질의로 요청
 * /etc/named.comf
-    - allow-recursion { none; };        # { trusted; };
-    - acl trusted { 127.0.0.1/24; };    # option 밖에 설정
+    - allow-recursion { none; };        # { trust; };
+    - acl trust { 127.0.0.1/24; };    # option 밖에 설정
     - recursion no;
 
 ---
@@ -65,14 +65,14 @@
 * ss -tanp | grep :80
 * ps -ef | grep http[d]
 
-```
+```bahs
 # ps aux |head -2
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 root         1  0.0  0.3 128608  7084 ?        Ss   08:52   0:01 /usr/lib/systemd/systemd
 ```
 * cpu, mem 점유율 확인 가능
 
-```
+```bash
 # ps -ef | head -2
 UID        PID  PPID  C STIME TTY          TIME CMD
 root         1     0  0 08:52 ?        00:00:01 /usr/lib/systemd/systemd --switched-root -
@@ -81,7 +81,7 @@ root         1     0  0 08:52 ?        00:00:01 /usr/lib/systemd/systemd --switc
 
 
 ### 의심 프로세스 확인 흐름
-```
+```bash
 # ss -tanp |grep :53
 LISTEN     0      10     192.168.122.1:53                       *:*                   users:(("named",pid=1471,fd=26))
 
@@ -122,13 +122,118 @@ method : GET, POST
 ### web 서버 종류
 * apache
 * iis
-* nginx
+* nginx 
+    - apache가 가지고 있는 문제점을 해결
 
 * tomcat 
-    - 단독 web server : jsp 환경 제공 : WAS
+    - 단독 web server (jsp 환경 제공) : WAS
     - 기존 web server + tomcat 구성 가능 : WEB
 
 #### WAS
 * jeus  - 티맥스
 * weblogic - Oracle
 * WebSphere - IBM사
+
+## java
+* 프로그램은 컴파일함
+    - 호환성이 떨어짐
+* 호환성을 위해 만들어짐
+* jsp도 비슷함
+
+#### jsp 사용 이유
+* ERP 사업에 유용했음
+    - ERP(Enterprise Resource Planning)
+        + 기업 내 생산, 물류, 회계, 영업, 구매, 재고 등 경영 활동을 통합적으로 관리하는 프로그램
+        + 기업에서 발생하는 정보를 통합적으로 실시간 공유할 수 있는 프로그램 = 전사적자원관리시스템 or 전사적통합시스템
+
+### .htaccess
+* 설정을 잘못하면 망함
+
+### 서버 관리자가 꼭 해야하는 설정
+* 서버 정보는 노출되지 않게 설정
+* Indexes, ExecCGI, FollowSymLinks, Includes 설정 하지 않기(잘 확인하기)
+* 에러 출력은 통일해서 사용
+
+### HSTS
+* 처음부터 HTTPS(443)를 사용, 암호화
+* http로 풀리지 않게 방지, 잠금
+
+###  QUIC(HTTP/3)
+* udp 사용(빠름)
+* 암호화 기능
+
+
+
+
+----
+----
+# DB 
+* 무겁고, 외부 노출 위험 때문에 로컬 호스트로 웹 서버하고만 통신함
+
+
+---
+---
+# FTP
+* 인증 :21/tcp
+* 데이터 전송 연결(Active) : 20/tcp
+    - 공유기가 있으면 데이터 전송 안됨 안됨
+    - 여러 클라이언트가 20번에 연결
+
+* Passive 모드
+    - 포트 낭비가 심함
+    - 클라이언트가 연결 요청
+
+`ss -tan |grep .74`
+* *.74의 주소의 ftp 서버의 '데이터 전송'을 확인
+
+#### 유용한 ftp 명령어
+```bash
+ftp> binary         # data를 스트림으로 받음, 큰 데이터를 나누어서 받음
+ftp> hash           # 해시출력으로 다운로드 상태 확인 가능
+ftp> lcd            # 자신의 다운로드 위치 변경
+```
+
+## !시스템 계정으로 로그인!
+* 소유자 권한으로 업로드 가능 - 장점
+* 시스템의 계정으로 로그인하기 때문에 위험함! - 단점
+    - 가상 계정으로 만들어 사용 권장
+
+## FTP 방화벽!
+* 방화벽 포트는 21/tcp만 열어줌
+* 20번 포트는 왜 없음?
+    - 메모리에 ESTABLISHD한 소캣은 바이패스(bypass)
+    - stateful inspection
+        + role 정책을 줄일 수 있음
+    
+
+
+#### TFTP
+- udp를 사용(69/udp)
+- 빠른 업데이트를 위해 사용
+- 로그인 절차 없음
+
+---
+## user를 신뢰할 수 있는가?
+* 로그인이 안되는 only 데몬을 동작시키기 위한 user를 생성하고 그 생성된 user로 데몬을 동작시킴
+    - 보안 관점에서는 권장
+* 0 ~ 1023 프로세스(admin/root 권한으로 실행한) 중에서 하나를 이용하여 client가 접근하면 1024 ~ 49151 사이의 포트로 접근 할 수 있는 정보를 제공
+    - rpc 사용
+    - `rpcinfo -p`
+        + 111 => 1024 ~ 49151 : 포트를 맵핑
+    - rpc는 접근 제어가 힘듬
+        + 보안 위험
+    - 개발자 입장에서는 사용하기 편함
+
+* 상대방이 접속할때 user권한은 믿을 수 없음
+    - shell을 못 사용하게 함
+    - root 권한으로 user계정으로 서비스(포트)을 사용할 수 있게함
+
+
+
+<!--https strict
+    http3
+    stateful inspection
+    ftp 가상 유저추가
+    rpc -->
+
+---
