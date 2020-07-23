@@ -16,7 +16,7 @@
 3. file -> /etc/hosts
 4. dns -> /etc/resolv.conf
 
-### root hint NS server
+### root hint name server
 * 라운드 트리 타임으로, 라운드 로빈을 함
 * 라운드 트리 타임이 낮으 쪽으로 호출을 해줌
 
@@ -229,7 +229,9 @@ ftp> lcd            # 자신의 다운로드 위치 변경
 
 * 상대방이 접속할때 user권한은 믿을 수 없음
     - shell을 못 사용하게 함
+        + NFSv4가 사용(서비스 계정 사용)
     - root 권한으로 user계정(포트)으로 서비스을 사용할 수 있게함
+        + NFSv3이 사용
 
 ---
 ---
@@ -237,13 +239,27 @@ ftp> lcd            # 자신의 다운로드 위치 변경
 ### cut
 * -d " " : 공백을 기준으로 필드 설정
 * -f : 필드 선택
+    - `cut -d " " -f 1,3 data.txt`
+
+### paste
+* 형식 paste [옵션] “파일이름” “파일이름”
+* 사용 예) # paste –d : exam1 exam2
+* 옵션
+    - -s 한 파일의 내용을 한 줄로 보여준 후 다른 파일의 내용을 한 줄로 덧붙인다.
+    - -d 출력되는 내용의 구분자를 지정한다
 
 ### diff
+* 형식 diff [옵션] “파일이름” “파일이름”
+* 사용 예) # diff exam1 exam2
+* 옵션
+    - -b space를 무시하고 비교한다.
 
 ### grep
 * i, b, v, l, c
     - -l : 파일 명
     - -c : 카운트
+    - -b : 바이트 오프셋
+    - -n : 텍스트 라인
 
 ### sort
 * <fort color="red">-r, -t, -k</fort>
@@ -267,11 +283,41 @@ ftp> lcd            # 자신의 다운로드 위치 변경
     ```
 
 ### awk
+* `df -hT | awk -F " " '$2 == "xfs"{print $1,"사용량 :",$6}'`
+* `df -hT |sed 's/%//g' |awk -F " " '$2 == "xfs" && $6 > 10{print $1,"사용량:",$6"%"}'`
 
+* `cat lastb.txt | awk '{ print $3 }' |grep ^ip- | sort |uniq | sed -e 's/ip-//g' -e 's/-/./g' -e 's/\.$//g'`
+* `awk 'BEGIN { sum=0; line = 0} { sum += $2; line ++;} END { average = sum /line; print "나이의 평균:" average "세";}' data.txt`
+
+
+---
+# iscsi 블록 스토리지
+
+### DAS
+
+### NAS
+
+### SAN
+* FC-SAN
+* IP-SAN
+
+#### SCSI(Small Computer System Interface)
+- 저장장치에 작은 첨퓨터를 넣어 입출력을 컨트롤하게 만듦
+- 컨트롤러가 여러 저장장치를 관리함
+- 속도 빠름, 안정성 높음(핫 스왑핑)
+
+### 파티션은 실린더 단위로 함!
+
+---
+# NFS 스토리지
+* fstab 잘 설정하기
+    - nfs 서버가 작동중이지 않으면, 스킵하도록 설정!
+
+---
 <!--https strict
     http3
     stateful inspection
     ftp 가상 유저추가
     rpc -->
 
----
+
