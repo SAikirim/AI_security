@@ -21,8 +21,11 @@
 * 라운드 트리 타임이 낮으 쪽으로 호출을 해줌
 
 ## DNS 서버는 restart를 하지 않음, reload함! 
+* 실제 DNS 서버는 restart를 하는데 오래 걸림
+
 `/etc/rndc.conf`
 * DNS 캐시에 관련된 설정 파일
+    - rndc 관련 패키지가 없어서 그런지, 파일이 존재하지 않음
 
 `# rndc reload`
 * DNS 서버 설정 재시작(리로드)
@@ -113,7 +116,7 @@ S.5....T.  c /etc/named.rfc1912.zones
 
 
 ### 전송에 대한 규칙
-HTTP 0.9 1.0 1.1 2.0
+HTTP 0.9, 1.0, 1.1, 2.0  
 method : GET, POST
 
 * http status code
@@ -146,7 +149,7 @@ method : GET, POST
         + 기업 내 생산, 물류, 회계, 영업, 구매, 재고 등 경영 활동을 통합적으로 관리하는 프로그램
         + 기업에서 발생하는 정보를 통합적으로 실시간 공유할 수 있는 프로그램 = 전사적자원관리시스템 or 전사적통합시스템
 
-### .htaccess
+#### .htaccess
 * 설정을 잘못하면 망함
 
 ### 서버 관리자가 꼭 해야하는 설정
@@ -174,10 +177,10 @@ method : GET, POST
 ---
 ---
 # FTP
-* 인증 :21/tcp
+* 인증 : 21/tcp
 * 데이터 전송 연결(Active) : 20/tcp
-    - 공유기가 있으면 데이터 전송 안됨 안됨
-    - 여러 클라이언트가 20번에 연결
+    - 공유기(NAT 네트워크)가 있으면 데이터 전송 안됨 안됨
+    - 다수의 클라이언트가 20/tcp에 연결
 
 * Passive 모드
     - 포트 낭비가 심함
@@ -226,9 +229,43 @@ ftp> lcd            # 자신의 다운로드 위치 변경
 
 * 상대방이 접속할때 user권한은 믿을 수 없음
     - shell을 못 사용하게 함
-    - root 권한으로 user계정으로 서비스(포트)을 사용할 수 있게함
+    - root 권한으로 user계정(포트)으로 서비스을 사용할 수 있게함
 
+---
+---
+# 문서 편집 명령어
+### cut
+* -d " " : 공백을 기준으로 필드 설정
+* -f : 필드 선택
 
+### diff
+
+### grep
+* i, b, v, l, c
+    - -l : 파일 명
+    - -c : 카운트
+
+### sort
+* -r, -t, -k
+
+### uniq
+* 중복 제거
+* -c
+
+### sed
+* `sed  '3q' data.txt`
+* `sed  '4,$d' data.txt`
+* `cat -n data.txt |sed -n '2,5p'`
+* `cat -n data.txt |sed -n '1,$s/japan/bosung/gp'`
+* `cat -n data.txt |sed -e 's/us/bosung/g' -e '/japan/d'`
+* ` sed -f sedfilter data.txt`
+    ```
+    # cat sedfilter
+    s/us/bosung/g
+    /japan/d
+    ```
+
+### awk
 
 <!--https strict
     http3
