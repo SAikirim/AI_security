@@ -246,7 +246,8 @@ ftp> lcd            # 자신의 다운로드 위치 변경
     - -c : 카운트
 
 ### sort
-* -r, -t, -k
+* <fort color="red">-r, -t, -k</fort>
+
 
 ### uniq
 * 중복 제거
@@ -258,7 +259,7 @@ ftp> lcd            # 자신의 다운로드 위치 변경
 * `cat -n data.txt |sed -n '2,5p'`
 * `cat -n data.txt |sed -n '1,$s/japan/bosung/gp'`
 * `cat -n data.txt |sed -e 's/us/bosung/g' -e '/japan/d'`
-* ` sed -f sedfilter data.txt`
+    - ` sed -f sedfilter data.txt`
     ```
     # cat sedfilter
     s/us/bosung/g
