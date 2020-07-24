@@ -1,0 +1,11 @@
+사용자 추가 시 관련된 파일 4개
+ /etc/passwd
+ /etc/shadow
+ /etc/group
+ /etc/gshadow
+ 각 파일의 들어가는 내용 알면 사용자 추가/수정 옵션이 파악됨.
+ ':'가 구분자이며 각 필드 파악하면됨.
+
+ 사용자 추가 useradd  정보수정 usermod 삭제 userdel
+ 그룹 추가 group add 정보수정 groupmod 삭제 groupdel  -> /etc/group 파일관련
+ /etc/shadow 관련 변경 -> age 명령어	

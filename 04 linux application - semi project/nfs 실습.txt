@@ -1,0 +1,26 @@
+[root@server ~]# cat /etc/exports
+/exports/pcj	70.12.113.0/24(rw,sync,sec=sys)
+[root@server ~]# systemctl restart nfs-server 
+[root@server ~]# exportfs -r    
+[root@server ~]# 
+[root@server ~]#  
+빠른 실습을 위해 편법으로  iptables -F 방화벽 정책을
+초기화 했습니다.  
+
+[root@server ~]# 
+[root@server ~]# showmount 70.12.113.64 --export
+Export list for 70.12.113.64:
+/exports/hj 70.12.113.0/24
+[root@server ~]# umount /mnt/aaa
+[root@server ~]# ls -ld /mnt/aaa
+drwxr-xr-x. 2 root root 6 Jul 23 17:51 /mnt/aaa
+[root@server ~]# 
+[root@server ~]# mount -o rw,sync,sec=sys 70.12.113.64:/exports/hj /mnt/aaa
+[root@server ~]# ls -ld /mnt/aaa
+drwxrwxr-x. 2 user01 nfsgroup 16 Jul 23 17:54 /mnt/aaa
+[root@server ~]# cd /mnt/aaa
+[root@server aaa]# ls
+hi
+[root@server aaa]# cat hi
+hello
+[root@server aaa]# 

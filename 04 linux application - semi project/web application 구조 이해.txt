@@ -1,0 +1,48 @@
+﻿전송에 대한 규칙 
+
+HTTP 0.9 1.0 1.1 2.0 
+method   : GET, POST   
+
+http status code 
+
+===== web server  =====
+iis
+apache 
+nginx
+         tomcat  ( 기존 web server + tomcat  구성 )
+
+====== WAS =====
+Oracle의 WebLogic, 
+IBM사의 WebSphere, 
+티맥스의 JEUS
+tomcat ( 단독 web server - jsp 환경 제공)
+          
+====================
+
+test.php
+<?php
+phpinfo();
+>
+
+
+1. /var/www/html2/ index.html   다른게 만들어 주세요.
+2. virtualhost  부분을 설정해주세요.
+3. bind   forward zone file 을 오픈해서 first second 설정을 해주세요. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
