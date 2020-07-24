@@ -319,6 +319,39 @@ ftp> lcd            # 자신의 다운로드 위치 변경
 * 실제로는 방화벽 서버에 DNS 서버 IP를 따로 설정한다.
 * 내부망은 방화벽 서버로 DNS 서버로 설정함
 
+##
+1. web server 2대를 구성 함 (70.12.113.x 3ea)
+    - ip는 2ea 여기다 구성
+    - web server - apache
+    - web server - nginx (기호에 따라 선택)
+2. DNS 서버 ip 1ea를 할당하여 구성
+    - first.domain, second.domain, webvirtual host 구성
+    - www cname 구성
+    - ssh, ftp 서브도메인 구성
+
+3. ssh.domain을 이용해서 ssh 서버에 접속하도록 ssh 서버 구성
+
+4. ftp를 구성하고 ftp 계정 두개 생성(virtual host)로 업로드될 위치를 디렉터리로 하는 파일 업로드 하도록 구성
+
+---
+# 네트워크
+
+```
+외부 네트워크 --- 장비 --- 내부 네트워크
+외부 주소 -------- X ---- 내부 주소
+```
+### 장비
+* 위 장비의 특징 : 다른 네트워크 주소를 이해 해야함
+    - 장비에 연결시키기 위한 네트워크 대역에 따른 네트워크 인터페이스가 존재
+    - 네트워크 인터페이스가 존재해야 함
+    - 내부 주소와 외부 주소를 연결시키기 위한 방법이 필요함
+        + 방법 = 라우팅
+
+내부 -> 외부 Source NAT - (static, MASQUREDING)
+외부 -> 내부 Destination NAT - port forward
+
+## DMZ
+* 
 
 ---
 <!--https strict
