@@ -1,0 +1,11 @@
+1. docker hub 가입
+https://www.throwawaymail.com/ 사이트에서 임시 이메일을 발급받아,
+https://hub.docker.com/ 사이트 가입 (향후 실습시 사용)
+
+2. Docker 사용환경 구축
+- 연습을 위해 VirtualBox에 'Ubuntu' 설치 18.04 버전 (공유폴더 내에서 다운로드)
+- https://docs.docker.com 및 교재를 참고하여 Docker 서비스 설치
+ => 설치과정에서 발생하는 문제 등 직접 해결해 볼 것 (네트워크 인터페이스 설정)
+
+3. Docker 동작 확인
+- docker 명령을 사용하여 최신 버전의 centos 이미지를 다운로드하고 컨테이너 실행시 표준입/출력으로 연결하여 컨테이너의 OS 정보 확인 (/etc/os-release)

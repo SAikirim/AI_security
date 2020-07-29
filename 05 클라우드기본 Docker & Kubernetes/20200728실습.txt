@@ -1,0 +1,26 @@
+1. Dockerfile을 사용한 이미지 작성
+다음과 같은 내용을 포함한 Dockerfile을 작성하고
+Dockerfile을 통해 이미지를 작성하시오
+
+1) 기본 이미지는 ubuntu를 사용하시오 (ubuntu:latest)
+2) ubuntu 에서 패키지 설치를 위해 repository를 업데이트하고 nginx 웹서버를 설치하시오 (apt-get 명령어 사용법 확인)
+3) index.html 파일을 작성하고, 작성한 index.html 파일이 /usr/share/nginx/html/ 경로에 복사하시오.
+index.html 파일의 내용은 임의로 작성하시오.
+4) 컨테이너 구동 시 nginx를 실행하시오.
+ (nginx) - 변경됨
+참고 : 다음 설정을 추가하여야 정상적으로 동작합
+RUN echo "\ndaemon off;" >> /etc/nginx/nginx.conf
+위 내용을 nginx 실행 전에 추가
+5) 컨테이너의 80번 포트로 접근을 허용하시오.
+
+2. Dockerhub에 이미지 업로드
+1번에서 작성한 이미지를 Dockerhub에 업로드하시오
+
+
+
+3. 네트워크 구성 / 볼륨 사용
+1) 새로운 bridge 네트워크를 생성하시오
+  subnet: 192.168.99.0/24 gateway: 192.168.99.254
+2) 1의 네트워크를 사용하는 httpd 이미지를 사용하는 컨테이너를 생성하는데, 호스트의 3456 포트로 접근시 컨테이너의 80포트로 접근하도록 설정하시오.
+3) 호스트에서 웹브라우저를 실행한 후, 80번 포트로 접근시 웹페이지가 출력되는지 확인하시오.
+4) 현재 사용중인 Windows 10 시스템에서 CentOS의 3456 포트로 접근할 때 웹 페이지가 표시되는지 확인하시오. (방화벽 설정을 확인할 것)

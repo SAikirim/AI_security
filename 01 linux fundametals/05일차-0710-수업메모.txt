@@ -1,0 +1,203 @@
+user05
+	uid gid 지정X ??
+	홈디렉토리 : /home/guest/user05
+	주그룹: user05
+	보조그룹: wheel (10)
+	암호 : user05
+ 	로그인 쉘 : /bin/tcsh
+	주석 : user05
+
+user04  주 그룹 : wheel -> 2000 user04 변경하고자함.
+   그룹 user04 2000 생성 -> user04 사용자정보 변경
+  $ sudo groupadd -g 2000 user04
+  $ grep user04 /etc/group
+  $ usermod -g 2000 user04
+
+user04 보조그룹 user01으로 변경
+  $ grep user01 /etc/group
+	user01:x:1001:
+  $ usermod -G 1001 ueer04
+  $ id user04
+	
+user04 보조그룹 wheel 추가
+	확인 id user04
+  $ grep wheel /etc/group
+	wheel:x:10:
+  $ usermod -aG 10 user04
+
+[admin@localhost ~]$ tail -5 /etc/group
+vboxsf:x:981:
+user01:x:1001:
+user02:x:1002:
+user03:x:1003:
+user05:x:2001:
+[admin@localhost ~]$ sudo groupadd -g 2000 user04
+[sudo] password for admin: 
+[admin@localhost ~]$ grep user04 /etc/group
+user04:x:2000:
+[admin@localhost ~]$ clear
+[admin@localhost ~]$ grep user04 /etc/passwd
+user04:x:2000:10::/home/guest/user04:/bin/sh
+[admin@localhost ~]$ sudo usermod -g 2000 user04
+[admin@localhost ~]$ grep user04 /etc/passwd
+user04:x:2000:2000::/home/guest/user04:/bin/sh
+[admin@localhost ~]$ id user04
+uid=2000(user04) gid=2000(user04) groups=2000(user04)
+[admin@localhost ~]$ sudo usermod -G 1001 user04
+[admin@localhost ~]$ id user04
+uid=2000(user04) gid=2000(user04) groups=2000(user04),1001(user01)
+[admin@localhost ~]$ sudo usermod -aG 10 user04
+[admin@localhost ~]$ id user04
+uid=2000(user04) gid=2000(user04) groups=2000(user04),10(wheel),1001(user01)
+
+UPG 스키마 : user private group 
+    uesr name = group name
+
+su 명령어는 사용자 전환 
+
+sudo 명령어.  명령어를 실행하는 동안 관리가 root가 될수있음.
+	 su - root
+	root의 암호를 입력- root 인증
+
+# useradd 생성할사용자명 -> 사용자 생성
+# passwd 사용자명  -> 암호 설정
+
+useradd, usermod, userdel /etc/passwd, 
+groupadd, groupmod, groupdel  /etc/group
+chage /etc/shadow
+
+리눅스/유닉스에서 권한 permission
+1) 파일/디렉토리 rwx(읽기,쓰기,실행) 부여
+2) 확장권한 (setuid, setgid, sticky)
+3) ACL (access control list)접근제어목록
+
+setuid : 실행파일에 적용. 실행되는 동안 파일의 소유자의 권한을 가질 수 있음. 실행이 끝나면 권한을 되돌려줌.
+setgid : 주로 디렉토리에 적용. 실행되는 동안 디렉토리 소유자의 권한을 가질 수 있음.
+sticky : 게시판과 같은 권한을 가짐.
+  누구든지 쓸수있으며, 읽을 수 있음. 단, 수정/삭제는 자신 소유의 파일만 가능함. (예외, root)
+
+[root@localhost ~]# ls -l /etc/shadow
+----------. 1 root root 1874 Jul 10 11:26 /etc/shadow
+[root@localhost ~]# ls -l /usr/bin/passwd 
+-rwsr-xr-x. 1 root root 27856 Apr  1 12:57 /usr/bin/passwd
+
+[root@localhost ~]# ls -l /run/log/
+total 0
+drwxr-sr-x. 3 root systemd-journal 60 Jul 10 09:12 journal
+
+[root@localhost ~]# ls -ld /tmp
+drwxrwxrwt. 14 root root 4096 Jul 10 13:40 /tmp
+
+SetUID : user 에 s권한   
+	chmod u+s 파일명
+	chmod u-s 파일명
+	chmod 4xxx 파일명
+SetGID : group에게 s 권한 부여
+	chmod g+s
+	chmod g-s
+	chmod 2xxx 파일명
+sticky : 누구든지 쓸고, 읽을수있음.
+	chmod o+t
+	chmod o-t
+	chmod 1xxx
+
+/home/admin/cat 파일 -> setuid설정되어있음.
+ 8진수모드로 setuid 해제하기.
+ $ cd ~
+ $ ls -l ./cat
+ $ chmod -4000 ./cat 
+ $ chmod 755 ./cat
+
+root 관리자  /project1  stikcy bit 권한을 부여함.
+ $ mkdir /project1
+
+ $ chmod +1000 /proejct  
+ $  chmod go+w /project
+  또는 chmod 1777 /project
+  또는 chmod o+t,go+w /project
+
+
+/root/dirA 에 ACL 설정하기.  
+	admin(user):rwx
+	wheel(group):r-x
+ $ mkdir dirA
+ $ setfacl -m u:admin:rwx dirA
+ $ setfacl -m g:wheel:r-x dirA
+
+----------------------------------
+3장. 작업스케쥴링
+d 데몬.
+ atd : 명령어 at , atq  : 1회성 작업
+ crond : 정기적으로 작업, 명령어 crontab  -l -e 
+
+$ at now +5min
+at> ps -ef > /root/0710/ps.list
+at> ps -ef > /dev/tty2
+at> ps -ef > /dev/pts/0
+$ at 15:50
+$ at 3:40 PM
+$ at 16:00 Jul 10 2020 
+$ at 071020  월일년
+$ at 20-07-10  년-월-일
+$ at 10.07.20   일.월.년
+
+
+p68 표 3-1 오타수정
+3번째 행 :  at Feb 12 2017 15:00  -> at 15:00 Feb 12 2017   시간 월 일 년
+4번째 행 :    2017년 2월 12일
+	월일년	021217  
+	년-월-일	02-12-17  -> 17-02-12
+	일.월.년 	02.12.17   -> 12.02.17
+
+ 작업 확인 crontab -l
+ 작업 등록 crontab -e (vi editor 실행)
+ 작업삭제 crontab -r
+
+월-금 오전9:10  who -> 결과를 user.list
+ 
+[root@localhost 0710]# crontab -l
+10	9	*	*	1-5	who > user.list
+[root@localhost 0710]# cat /var/spool/cron/root
+10	9	*	*	1-5	who > user.list
+-------------------------------------
+(4장) 새로운 디스크 장착 -> 인식 확인 -> 파티셔닝 -> 
+(5장) 파일시스템 생성(포맷) -> 마운트(디렉토리와 장치랑 연결)
+
+5장 : 가상메모리 (파티션, 파일 로 확장)
+
+디스크 논리적 구조 : 섹터, 트랙, 실린터, 파티션
+
+MBR 마스터 부트 레코드
+https://ko.wikipedia.org/wiki/%EB%A7%88%EC%8A%A4%ED%84%B0_%EB%B6%80%ED%8A%B8_%EB%A0%88%EC%BD%94%EB%93%9C
+	부팅이 가능.
+	파티션 테이블 4개만 있음. (주파티션 4개만가능)
+	최대 파티션 크기 2TB
+
+GPT 방식
+	부팅 코드 X, 부팅 안됨.
+	파티션 테이블 128개
+	최대 파티션 크기 8ZB
+https://ko.wikipedia.org/wiki/GUID_%ED%8C%8C%ED%8B%B0%EC%85%98_%ED%85%8C%EC%9D%B4%EB%B8%94
+
+ BIOS - 디스크 MBR - 부팅 파티션 -> 부팅 이미지 -> 부팅
+
+ BIOS - 디스크 GPT  부팅X (부팅이 되는 펌웨어로 변경 필요)
+
+ EFI/UEFI - 디스크 GPT  부팅
+
+disk 인터페이스에 따른 인식 이름이 다름
+	IDE -> hda ,hdb, hdc, hdd
+
+	SATA, SCSI 인터페이스 -> sda, sdb,sdc....
+
+sda 30G 파티셔닝
+	10G	sda1
+	10G	sda2
+	10G	sda3
+p127
+그림 4-15
+ 파티션 1, 2, 3 : primary 파티션
+ 나머지 모든 공간 : extended 파티션 4 
+ 필요한 만큼 잘라서 logical 파티션  5,6,7 파티션
+
+

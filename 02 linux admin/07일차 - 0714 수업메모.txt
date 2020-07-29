@@ -1,0 +1,217 @@
+LVM
+
+어제 실습하신분들은  2개 장착되어있고,
+자동마운트되어있음.
+1) 자동마운트 제거
+	/etc/fstab  <-- 해당 라인 삭제
+	/ , /boot, /home, swap   4줄. 
+	(12번줄까지는 삭제하면 안됨.)
+2) 파티션 정보 삭제.
+poweroff ->  disk 2개 더 추가 하기. (8G 2개)
+
+어제 실습안하셨던분은 : disk 4개.
+
+4개 disk    장치 확인 $ ls -l /dev/sd* 
+파티셔닝 :   systemid : linux lvm
+
+$ su -
+#  fdisk /dev/sdb
+	n
+	(p) 엔터 
+	(1) 엔터
+	(2048) 엔터
+	() 엔터
+	
+	t
+	8e
+	
+	p 확인
+	w 저장
+
+#  fdisk /dev/sdc
+#  fdisk /dev/sdd
+#  fdisk /dev/sde
+
+# fdisk -l /dev/sdb 확인
+# fdisk -l /dev/sdc
+# fdisk -l /dev/sdd
+# fdisk -l /dev/sde
+
+
+lvmdiskscan
+pvcreate /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1
+pvs
+lvmdiskscan
+vgcreate vg_test /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1
+vgs
+lvcreate -n lv_test1 -l 1000 vg_test
+lvs
+lvcreate -n lv_test2 -L 10G vg_test
+
+볼륨그룹 : vg_teset  논리볼륨 : lv_test1, lv_test2
+  /dev/vg_test/lv_test1   	xfs
+  /dev/vg_test/lv_test2	ext4
+
+디스크 - 파티셔닝 - 파일시스템 생성 - 마운트 - 사용
+lvm  생성 (pv - vg - lv) - 파일시스템 생성 - 마운트 - 사용
+
+파일시스템 생성 mkfs
+  # mkfs.xfs /dev/vg_test/lv_test1
+ 
+파일생성한 장치 확인
+  # blkid  또는 lsblk -f
+
+장치와 디렉토리를 연결해야만 사용할수있음. -마운트
+ 디렉토리 : 마운트 포인터
+ 수동마운트, 자동마운트 
+  # mkdir /mnt/lvm1 (마운트포인트 생성)
+  # mount  /dev/vg_test/lv_test1 /mnt/lvm1 (연결)
+   -> 수동마운트
+
+  # mount | grep mnt 마운트된 목록확인
+  # blkid  또는 lsblk -f  디스크장치로 마운트확인
+  # dh -h  디스크공간 확인
+
+  # umount /mnt/lvm1
+  # vi /etc/fstab
+ 자동마운트   /etc/fstab 항목 추가해야함. 
+  부팅할 때 해당디스크를 마운트 함.
+  # mount -a   (/etc/fstab 내용을 현재 메모리 올려옴.)
+  잘못 작성을 하면 부팅이 안되기 때문에 반드시 -a 확인
+
+강사PC 접근하면
+http://70.12.113.50:8080/
+
+centos.ova 파일 공유
+구글 공유 - URL 줄임 : https:/c11.kr/multilinux
+
+
+systemd start / stop / status 서비스 이름
+systemctl status sshd.service
+systemctl stop sshd.service
+systemctl start sshd.service
+systemctl restart sshd.service
+systemctl enable sshd.service (부팅했을 때 자동실행)
+	disable
+
+service 가 active = running 현재 동작중
+	inactive 현재 동작중이지 않음.
+	
+	enabled 부팅시 자동으로 실행
+	disabled 부팅시 자동으로 실행하지 않음(수동)
+
+	masked 충돌을 막기위해 유닛이 시작되지못하도록 마스킹함.
+
+
+콘솔에서만 하세요.
+ systemctl status sshd.service
+ systemctl start sshd.service
+ systemctl stop sshd.service
+ systemctl rsetart sshd.service  / PID가 변경됨.
+ systemctl enable sshd.service
+ systemctl disable sshd.seirvice
+ systemctl reload sshd.service  /PID가 변경되지않음.
+ systemctl mask firewalld.service
+
+메모리에 있는 journal 데이터를 disk 저장하기
+
+
+1) 설정
+현재 /run/log/journal/ 디렉토리의 소유자, 소유그룹, 권한이 동일해야함.
+# ls -l /run/log/journal/  (메모리 - 전원off -사라짐)
+total 0
+drwxr-s---+ 2 root systemd-journal 60 Jul 14 10:12 799af2ed5c8d2548b3fbab21d3b4c26b
+
+저장할 디렉토리 생성
+# mkdir /var/log/journal
+# ls -ld /var/log/journal
+drwxr-xr-x. 1 root root 6 Jul 14 10:12 /var/log/journal
+
+# chmod g+s /var/log/journal
+# ls -ld /var/log/journal
+drwxr-sr-x. 1 root root 6 Jul 14 10:12 /var/log/journal
+
+# grep systemd-journal /etc/group
+# chown root:systemd-journal /var/log/journal
+# ls -ld /var/log/journal
+drwxr-xr-x. 1 root systemd-journal 6 Jul 14 10:12 /var/log/journal
+
+
+
+
+2) 데몬 재시작 ( systemd-journald )
+# systemctl restart systemd-journald
+# ls -l /run/log/journal 
+	없음
+# ls -l /var/log/journal
+
+------------------------------
+
+LVM  (pv - vg - lv ) -  파일시스템 생성 - 마운트(자동)
+
+systemd PID=1  (unit)
+ unit 조회
+
+systemd-journald  /run/log/journal 메모리
+ 로그 검색
+
+부팅절차(systemd)
+
+------------------------------------------------------------
+
+1.  warining 등급(priority)에 해당하는 로그를 최신으로 보는 명령어는?
+
+
+2. 디스크에 저장된 로그(boot-id) 중 오늘 오전 10~11시 사이의 로그는 보는 명령어는?
+
+
+
+3. 디스크에 저장된 로그(boot-id) 중
+오늘 오전에 admin 사용자가 발생하고 info 의 priority인 로그를 출력하시오.
+
+
+
+
+4. 유닛의 활성화(enable) 상태를 확인해보시오.
+
+
+5. sshd, atd, crond 서비스의 상태를 확인해보시오.
+
+
+
+6. sshd 서비스를 비활성화 시키시오.
+
+
+
+7. sshd 서비스를 중지시키고 비활성화 시키시오
+
+
+
+8. sshd 서비스를 마스크 상태로 만드시오. 
+
+
+
+9. sshd 서비스를 시작해보시오.
+
+
+
+10. sshd 서비스의 마스크 상태를 해제하고 시작한 후 상태를 보시오.
+
+
+11. 유닛 실행(active) 상태를 확인해보시오.
+
+
+12. 서비스 유닛의 실행 상태를 확인해보시오.
+
+
+13. not-found 나 inactive 인 서비스 유닛의 실행 상태를 확인해보시오.
+
+14. sshd 서비스의 상태를 확인하고 리로드와 재시작하면서 pid 를 확인해보시오.
+
+
+
+12. gdm의 의존성을 확인해보시오.
+
+
+
+
