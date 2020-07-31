@@ -1,0 +1,323 @@
+2020년 7월 30일
+
+파드(Pod, Pods)
+- 컨테이너의 모음
+- 파드 별로 IP가 할당
+- 모든 컨테이너가 파드의 IP를 공유함
+- 자원을 공유 (볼륨)
+- 파드 내에 들어가는 컨테이너는 단일 노드에 위치
+
+===========================================
+
+파드 구성 YAML 파일
+
+apiVersion: 오브젝트 사용시 필요한 API 버전정보
+kind: 오브젝트의 종류 (Pod)
+metadata: 파드의 기본 속성 (이름, 레이블, 네임스페이스 등)
+  name: 파드 이름
+  namespace: 파드를 배치할 네임스페이스 지정
+  labels: 파드를 식별하기 위한 레이블 (키-값의 쌍)
+spec: 파드의 구체적인 구성 설정 (파드 내 컨테이너 설정)
+  containers: 컨테이너 구체적인 설정 (복수의 컨테이너 기술 가능)
+    image: 기본이 되는 이미지
+    name : 컨테이너 이름 (파드 이름과 다름)
+    ports: 네트워크를 통해 서비스를 제공하는 컨테이너의 정보
+
+
+==========================================
+
+YAML 파일을 사용한 오브젝트 생성
+$ kubectl create -f [YAML 파일명]
+
+YAML 파일을 사용하여 만든 오브젝트 삭제
+$ kubectl delete -f [YAML 파일명] 
+
+오브젝트 상태 확인
+$ kubectl get [오브젝트명]
+
+주요 오브젝트 상태 확인(파드, 컨트롤러, 서비스)
+$ kubectl get all
+
+===========================================
+
+레이블
+- 쿠버네티스에서 레이블은 오브젝트를 식별할 수 있는 중요 항목
+- 레이블은 반드시 키-값 형태로 작성
+- 키는 영문자,숫자,일부특수문자(- _ .)만 사용하여 63자 이내로 작성
+
+전체 파드 레이블 정보 확인
+$ kubectl get pods --show-labels
+$ kubectl get pods -L [키],[키]....
+
+특정 파드의 레이블 정보 확인
+$ kubectl get pods [파드명] -o yaml
+$ kubectl describe [파드명]
+
+==========================================
+
+셀렉터
+- 레이블의 키/값을 기준으로 오브젝트를 선택
+- 키의 존재 유무 / 키=값의 일치여부
+
+셀렉터 유형
+- = : 균등 기반 셀렉터
+- in, notin : 집합기반 셀렉터
+- ! : not의 의미를 가짐
+
+ex) 
+app		// app 키를 가진 오브젝트
+app=myapp	// app 키에 myapp 값이 들어있는 오브젝트
+!app		// app 키를 가지고있지 않은 오브젝트
+app!=myapp	// app 키가 있으며, 키의 값이 myapp이 아닌 오브젝트
+app in (myapp, yourapp)	// app 키가 있으며, 값이 myapp, yourapp 중 하나인 오브젝트
+app notin (myapp, yourapp)	// app 키가 있으며, 값이 myapp, yourapp 중 하나에 해당하지 않는 오브젝트
+
+=========================================
+
+어노테이션 Annotation (주석)
+- 파드에 대한 부가적인 설명
+- 레이블과 달리 오브젝트 식별용도로 사용하지는 않음
+- 키/값 구성으로 작성하여야 함
+
+pod.metadata.annotations 항목에 작성하거나
+$ kubectl annotate pod [파드명] [키]=[값] 형태로 작성
+
+==========================================
+
+네임스페이스
+- 독립적으로 작업할 수 있는 이름 공간
+- 리눅스에서 컨테이너 격리를 위해 활용하는 네임스페이스와는 다름
+- 별도로 지정하지 않을 경우 기본 네임스페이스는 default
+- 기본으로 생성되어 있는 네임스페이스
+	kube-system : 쿠버네티스 구성을 위해 작성된 네임스페이스
+	kube-public : 모든 사용자가 읽기 가능한 네임스페이스. 미사용
+	kube-node-lease: 쿠버네티스 노드의 가용성 체크를 위한 용도
+	default : 기본 네임스페이스
+- 네임스페이스는 오브젝트를 논리적으로 격리함 : 네임스페이스가 다르면 같은 이름의 오브젝트도 생성 가능
+
+네임스페이스 지정
+- 오브젝트 생성시 -n / --namespace 옵션으로 지정
+- YAML 파일 내 metadata.namespace 부분에 작성
+
+==========================================
+
+컨트롤러
+- 파드의 동작 규칙을 정의함
+- 다양한 유형이 있음 : ReplicationController, ReplicaSet, DaemonSet, Job, CronJob
+
+==========================================
+
+라이브니스 프로브(Liveness Probe)
+- 기본적으로 쿠버네티스는 파드가 구동하고 있는지 아닌지 만을 확인함
+- 정상적으로 서비스를 제공하지 못하는 파드의 경우도 구동되고 있으면 RUNNING
+- 파드의 동작상태를 확인하기 위하여 사용하는 것이 Liveness Probe
+
+Liveness Probe 유형
+- httpGet : 웹서비스를 제공하는 파드의 경우, 웹 요청의 응답으로 확인
+- tcpSocket : 네트워크 특정 포트 연결 시도의 응답으로 확인
+- exec : 컨테이너에 명령을 실행하고 실행결과로 확인
+
+작성방식
+pod.spec.containers.livenessProbe 항목에 작성
+
+동작방식
+- Liveness Probe는 설정된 주기에 따라 동작상태를 확인
+- 동작이 비정상일 경우 컨테이너를 재시작
+- 컨테이너 재시작 후 비정상동작이 기준치 이상 발생할 경우, 해당 파드를 종료
+
+==========================================
+
+레플리케이션 콘트롤러 (ReplicationController)
+- apps/v1 API 버전 사용
+- 지정된 개수만큼의 복제본 파드를 유지시키는 용도로 사용
+	파드 부족시 : 파드 복제 생성
+	파드 과다시 : 파드 제거
+- 파드 개수를 확인하는 기준 : 레이블 셀렉터
+- 파드 복제시 템플릿 사용 : 파드 작성요령과 유사함 (metadata.name은 뺌)
+
+복제 개수 지정 : spec.replicas
+
+셀렉터 : spec.selector
+- 키/값을 모두 사용하여야 함.
+- 단일 항목만 적용 가능
+
+==========================================
+
+레플리카셋 (ReplicaSet)
+- apps/v1 API 버전 사용
+- 레플리케이션 콘트롤러와 동일한 기능이나, 셀렉터 자유도가 높음
+	다중 레이블 지원
+	키 존재 유무로만 식별 가능
+
+레플리카셋 셀렉터 유형
+spec.selector.matchLabels : 레플리케이션 콘트롤러와 동일한 구성
+spec.selector.matchExpressions : 다양한 레이블 선택옵션 사용가능
+	key: [키]
+	operator: <In | NotIn | Exist | DoesNotExist >
+	values:
+	- 값1
+	- 값2
+	// In / NotIn : values 항목 필요
+	// Exist / DoesNotExist : values 항목 불필요 (키 존재여부만 확인)
+
+mynapp-rs-exp.yml 		// 레플리카셋, matchExpression 예
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mynapp-rs-exp
+spec:
+  replicas: 3
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values: 
+      - mynapp-rs-exp
+  template:
+    metadata:
+      labels:
+        app: mynapp-rs-exp
+    spec:
+      containers:
+      - name: mynapp
+        image: c1t1d0s7/myweb
+        ports:
+        - containerPort: 8080
+
+===========================================
+
+데몬셋 (DaemonSet)
+- apps/v1 API 버전 사용
+- 복제 개수가 아닌, 지정된 노드마다 1개씩 생성되도록 구성하는 컨트롤러
+
+노드셀렉터 : 데몬셋이 배포될 대상 지정. 각 노드의 레이블을 사용
+
+spec.template.nodeSelector
+- 셀렉터 정보는 레이블과 같이 '키: 값' 형태로 작성
+ex) 
+    nodeSelector:
+      node: Development
+
+노드 레이블 확인
+$ kubectl get nodes --show-labels
+
+노드 레이블 생성
+$ kubectl label nodes [노드이름] 키=값
+
+노드 레이블 값 제거
+$ kubectl label nodes [노드이름] 키='' --overwrite
+
+노드 레이블 키 제거
+$ kubectl label nodes [노드이름] 키-
+
+===========================================
+
+잡 컨트롤러
+- batch/v1 API 버전 사용
+- 일회성 작업 지시를 위하여 사용
+- 실행회수를 지정함 (completion)
+- 동시실행회수를 지정가능 - 병렬실행 (parallelism)
+- 작업마다 새로운 파드를 생성하고, 작업이 완료된 파드는 종료
+
+Job Controller 예제 파일 mynapp-job.yml
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mynapp-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: mynapp-job
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: mynapp
+        image: busybox
+        command: ["sleep","60"]
+
+
+작업회수 지정
+spec.completions: 3
+
+동시실행개수 지정
+spec.parallelism: 3
+
+==========================
+
+크론잡 CronJob
+- batch/v1beta1 API 버전 사용
+- 단일 실행이 아닌 주기적인 실행을 제공하는 컨트롤러
+- 기존 crontab 작성과 동일한 작성방법 (분 시 일 월 요일)
+
+크론잡 예제 파일 : mynapp-cronjob.yml
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mynapp-cronjob
+spec:
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: mynapp-cronjob
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: mynapp
+            image: busybox
+            command: ["sleep","60"]
+
+==========================
+
+서비스
+- 컨트롤러에 의해 생성된 파드는 생성시 임의의 IP주소 할당
+- 파드는 유연하게 동작하므로, 생성/삭제가 빈번하게 발생함
+- 관리자는 직접 파드의 정보에서 주소를 확인할 수 있으나, 일반적인 클라이언트는 각 파드의 주소를 확인할 수 없음
+- 서비스는 컨트롤러에 의해 구성된 임의의 파드 주소 대신 고정된 진입점을 생성해 주는 오브젝트
+
+=================================
+
+클러스터 내부 서비스
+- 클러스터 내부의 다른 오브젝트에서 접근 가능한 서비스
+- 외부 진입점은 제공하지 않음
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mynapp-svc
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: mynapp-rs
+
+service.spec.ports : 서비스에서 제공할 포트의 목록 (다수의 포트 서비스 가능)
+	port: 서비스에서 오픈할 포트
+	targetPort: 컨트롤러의 파드로 연결할 포트 (파드가 열고있는 포트)
+
+엔드포인트
+$ kubectl get endpoints
+- 서비스에서 연결한 컨트롤러로 접근시 실제 접근하는 각 파드의 주소와 포트번호 정보
+
+세션 어피니티 설정
+- 쿠버네티스의 서비스는 라운드-로빈(Round-Robin) 형태로 동작
+- 세션을 유지해야하는 서비스를 제공하는 파드가 다른 파드로 교체될 경우 세션 유지가 끊길 수 있음
+- 세션 어피니티 설정 적용시 클라이언트의 IP를 기준으로 동일한 파드로 요청 전달
+
+service.spec.sessionAffinity : ClientIP 
+- 클라이언트 IP를 기준으로 세션 어피니티 설정
+
+
+
+
+
+
+
+
