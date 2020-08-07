@@ -163,7 +163,7 @@ Cloud <==> On-Premises(온프레미스, 온프렘)
     - 메모리 제한을 기본값(무제한)으로 설정한 컨테이너의 경우 --memory-swap 옵션을 -1로 설정하여야 메모리 제한 변경 가능  
 * `docker attach [컨테이너명]`
 * `docker exec <container> <command>` 
-* `docker top`
+* `docker top <컨테이너 이름, ID> <ps 옵션>`
 * __*`docker logs`*__
 * `docker cp`
 * `docker diff`
@@ -237,7 +237,7 @@ docker network create -subnet [서브넷정보] --gateway [게이트웨이정보
 ## 컨테이너 간 연결
 
 1. link
-* `docker run .... --link [호스트명] ...`
+* `docker run .... --link [호스트명] [이미지 이름]`
     - 컨테이너의 /etc/hosts 파일을 수정하여 이름으로 통신 가능
 
 2. 포트포워딩

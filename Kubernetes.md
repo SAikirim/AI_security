@@ -129,7 +129,7 @@ sudo chown vagrant:vagrant -R ~/.kube
 * 기본 명령어 : kubectl
 
 ### 쿠버네티스 구성상태 확인
-`kubectl cluster-info` : 쿠버네티스 구성요소 상태 확인
+`kubectl cluster-info` : 쿠버네티스 구성요소 상태 확인  
 `kubectl get nodes` : 쿠버네티스에 등록된 노드 확인
 
 ### 쿠버네티스 API
