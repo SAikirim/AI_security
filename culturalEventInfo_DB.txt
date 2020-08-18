@@ -1,0 +1,41 @@
+﻿--- Install
+
+
+--- Create
+create database CEpreference;
+use CEpreference
+
+---
+CREATE TABLE preference(
+id int not null auto_increment,
+age VARCHAR(14) DEFAULT NULL,
+gender Varchar(10) DEFAULT NULL,
+desired_date date DEFAULT NULL,
+time VARCHAR(12) DEFAULT NULL,
+jenre VARCHAR(25) DEFAULT NULL,
+keyword VARCHAR(255) DEFAULT NULL,
+PRIMARY Key (id)
+);
+---
+explain preference;
+
+* AUTO_INCREMENT
+  - 해당 칼럼의 값이 자동으로 1씩 증가됨 
+
+* DEFAULT CURRENT_TIMESTAMP
+  - 해당 칼럼의 값이 없으면 디폴트 값으로 현대 시간(TIMESTAMP) 값을 사용
+
+* ON UPDATE CURRENT_TIMESTAMP
+  - 해당 로우 값이 업데이트하면, 해당 칼럼의 값을 수정함(수정이 이루어지는 시간으로 수정)
+* UNIQUE KEY
+  -  값이 중복되면 안 됨
+
+--- DATA
+http -v POST http://localhost:5000/prefernce \
+age=성인 \
+gender=남 \
+desired_date=2020-08-24 \
+time=오후 \
+jenre=기타 \
+keyword=피아노
+---
