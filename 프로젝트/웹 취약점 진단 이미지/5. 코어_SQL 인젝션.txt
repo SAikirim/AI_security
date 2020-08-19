@@ -1,0 +1,11 @@
+* GET /m_view.php
+  - ps_db, ps_boid, 
+
+* POST /jsp/login_proc.jsp 
+  - userid, passwd
+
+* GET /m_mall_list.php?
+  - ps_ctid, ps_max_money
+
+* POST /m_poll_ok.php
+  - ps_poid, comment_name, comment_body
