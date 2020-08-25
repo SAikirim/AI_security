@@ -118,3 +118,29 @@ service sshd start
 * 정책이 여러항목일 경우, 우선순위가 중요함. (RULE ID)
     - 첫번째 정책을 조건과 비교하고 맞으면 ACTION.
     - 조건이 맞지않으면 아래 RULE ID로 내려가서 조건과 비교하고 맞으면 그에 대한 ACITION. 
+
+### VPN(Virtual Private Network)
+* 가상사설망
+    - 가짜로 사설망처럼 사용 -> 사실은 공인망을 사설망처럼 사용함 -> 암호화
+
+* 구성방식
+    - P2P(또는 Site to Site)
+    ```
+		      공인망
+	(N) 본사---------ISP----------지사(N)
+	     VPN peer	         VPN peer
+    ```
+    - Remote Access
+    ```
+	      공인망
+	(N) 본사---------ISP-----------재택근무
+	 VPN server		Client
+    ```
+* 프로토콜 
+    - L2TP, PPTP
+        + 거의 사용하지 않음
+    - IPsec (IP를 포함해서 암호화, ESP, AH)
+        + 터널링
+        + 단점 : 사용자
+    - SSL VPN
+        - 사용자 인증 가능
