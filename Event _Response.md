@@ -30,10 +30,22 @@
     - 웹서비스에 대한 보안정책으로 웹공격 방어솔루션
 
 5. EMS 
+6. RMS
+    - 취약점 관리
+7. NAC(Network Access Control)
+    - 직원 PC(End Point) 관리
+    - 모니터링
+8. PMS(Package Managment System)
+    - 폐쇄망 업데이트 패치
+    - 내부 시스템이 PMS를 통해서 패치/업데이트를 수행
+    - 내부시스템이 인터넷 X
 
 #### ESM, TMS, RMS의 차이
-참고 : Terminology/ESM, TMS, RMS의 차이.txt
-
+* 참고 : Terminology/ESM, TMS, RMS의 차이.txt
+* RMS
+    - 위험 관리 시스템
+    - 자산을 확인 후, DB화
+---
 ### untangle.com
 * package download & 설치시 계정 필요함.
     - soyoung.lim2009@gmail.com / qwer1234
