@@ -17,6 +17,12 @@
         + 내부에서 나간 포트는 외부에서 다시 들어올 때 포트 허용
     - Generator 방화벽(3세대)
         + 콘텐츠, 사용자별 설정
+    - 외부로부터 내부를 보호함
+    - 단점
+        + ip/port를 속이는 경우 허용이 될 수 있음
+        + 내부 공격은 차단 못함
+        + 우회하게 되면 차단 못함
+        + 어플리케이션 데이터를 차단하지 못함(바이러스)
 
 2. IDS/IPS 침입탐지/방지 시스템
     - 사전에 정의된 률과 트래픽의 비교를 통해 보안 위협을 찾아냄.
@@ -90,8 +96,8 @@ service sshd status
 service sshd start
 ```
 
------------------------------------------------
-
+### Topology 모습
+```
  INTERNAL------------FW----------EXTERNAL(INTERNAL)
  (WIN7)		  |
 		  |
@@ -99,7 +105,9 @@ service sshd start
 		(CENTOS)
 
 현재 WIN7 -> CENTOS   WEB, SSH 서비스 가능.
+```
 
+### 테스트
 ```
 정책1 
    사내망 192.168.1.0/24 직원 -> 사내서버망 웹서버 192.168.2.10 로
@@ -144,3 +152,81 @@ service sshd start
         + 단점 : 사용자
     - SSL VPN
         - 사용자 인증 가능
+
+---
+## IDS
+* 정규표현식 확인
+    - https://regexr.com/
+
+#### snort : https://www.snort.org/
+#### suricata : https://suricata-ids.org
+* suricata rule
+    - 구 사이트 : https://redmine.openinfosecfoundation.org/projects/suricata/wiki/Suricata_Rules
+    - 새 사이트 : https://suricata.readthedocs.io/en/latest/rules/index.html
+
+
+### 외부에서 내부로 접근 테스트
+```
+untangle 첫번째 NIC -> nat나 (vmnet8)로 변경
+ 192.168.10.x (dhcp)
+kali를 NAT로 연결
+
+    vmnet1	vmnet8
+     win7--------fw-----------kali
+	<-----------------
+```
+
+### 원래 안되야 정상이지만 호스트로 접근됨
+* 라우팅 설정함
+```
+kali 
+ route add -net  [network/prefix] gw [gateway_ip]
+ win7이 포함된 네트워크 : 192.168.1.0/24
+ gateway ip = untangle fw external ip 192.168.10.128
+
+# route add -net 192.168.1.0/24 gw 192.168.10.128
+# route
+	확인
+# ping 192.168.1.x (win7)
+```
+
+### 내/외부 접근 테스트
+```
+1) bind_tcp  : nc.exe
+ server/client
+
+  internal			external
+  victim---------fw--------------attacker
+  server		<-	client
+
+@win7
+cmd> nc.exe -lvp 80
+
+@kali
+# nc 192.168.1.75 80
+
+2) reverse_tcp
+ server/client
+
+  internal			external
+  victim---------fw--------------attacker
+  client		->	server
+			(port open : listen)
+```
+* IDS에서 탐지 -> 차단  : IPS
+    - 차단된 이벤트의 SID를 확인
+        + 2018392 (cmd 출력 내용을 확인해 차단)
+        + 2210041
+        + 2210051
+
+
+## utm : untangle , pfsense
+1) untangle : 네트워크구성 및 ids/ips
+2) 웹서비스 (APM) 구성, 웹진단(zap) ->로그 발생
+```
+금요일 : 2번 예정
+노트북
+자료 : 구글공유
+ 준비 : vmware, 웹서버OS vm, kali vm
+ (목요일까지 준비 -> 금요일 수업)
+ ```
