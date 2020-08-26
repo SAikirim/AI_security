@@ -1,0 +1,69 @@
+공유
+1301호  http://70.12.113.72:8080   
+1303호  http://70.12.113.157:8080  / netcat (삭제)
+
+강사 pc  http://70.12.113.49:8080   <- 수업메모 공유
+
+utm : 방화벽+IDS/IPS+VPN+web filter 등
+	untangle  : 내부 직원망 위주. (DMZ 서버망 X)
+	astaro(sophos) : clinet/server, 지사 많은 경우 등 기능이 많음.
+	pfsense : 다양한 기능이 많이 있음. 
+	안랩 등...
+
+untangle.com
+package download&설치시 계정 필요함.
+ soyoung.lim2009@gmail.com  qwer1234
+
+
+untangle
+첫번째 NIC : NAT 또는 vmnet8  192.168.10.x/24(dhcp)
+두번째 NIC : VMNET1  192.168.1.5/24
+세번째 NIC : VMNET2  192.168.2.5/24
+
+
+설치 app : firewall, captive portal, 
+ report, insrection prevention(IPS)
+
+WIN7 NIC : 로그인암호 (P@ssw0rd)
+-> vmnet1로 연결 -> 부팅 -> dhcp 
+ untangle로부터 192.168.1.50~99 할당받는지 확인
+인터넷 확인
+
+win7 cmd>ping 192.168.10.2
+
+	vmnet1		vmnet8(nat)
+win7 ----------------------fw--------------->   gw(10.2)
+	패킷캡쳐		패킷캡쳐
+
+wireshark : icmp 필터
+ v1, v8 네트워크의 ping 패킷의 src/dst비교하기.
+
+
+-------------------
+untangle 세번째 NIC 설정 
+	이름 : servers_in
+	static ip : 192.168.2.5/24
+	DHCP설정 여부는 자유
+
+centos : NIC - vmnet2 연결
+	ip 수동 : 192.168.2.10 /24
+	gateway : 192.168.2.5
+	dns : 192.168.10.2 또는 8.8.8.8
+
+centos -> gw 2.5 ping test
+	인터넷 되는지 확인 , (NAT)
+
+
+@centos 웹서비스, ssh서비스 활성화
+rpm -qa httpd
+rpm -qa openssh
+service httpd status
+service httpd start
+service sshd status
+service sshd start
+
+
+win7 ->  centos로 웹/ssh 서비스 확인
+centos 방화벽에 drop(허용x)
+
+

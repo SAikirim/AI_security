@@ -1,0 +1,104 @@
+방화벽
+	packet filtering (IP/Port)
+	stateful inspection
+ 외부로 부터 내부를 보호함.
+ 단점 ip/port 속이는 경우도 허용이 될수있음.
+	내부에 공격자가 나오는 경우는 차단하지 못함.
+	우회하게 되면 차단되지 못함.
+	APPLICATOIN DATA를 차단하지못함(바이러스)
+
+출발지IP 출발지port -> 목적지ip 목적지port
+출발지IP 출발지port <> 목적지ip 목적지port
+출발지IP 출발지port <- 목적지ip 목적지port (없음)
+
+
+grep ^root /etc/passwd
+
+ [^]
+^시작 마지막$
+
+grep nologin$ /etc/passwd
+
+명령어1 | 명령어2
+ls -al | wc -l
+
+ \|
+
+
+http://www.weitz.de/regex-coach/
+https://regexr.com/
+
+snort : https://www.snort.org/
+suricata : https://suricata-ids.org/
+
+suricata rule
+구 사이트
+https://redmine.openinfosecfoundation.org/projects/suricata/wiki/Suricata_Rules
+새 사이트
+https://suricata.readthedocs.io/en/latest/rules/index.html
+--------------------------------
+untangle 첫번째 NIC -> nat나 (vmnet8)로 변경
+ External 인터페이스를 192.168.10.x (dhcp) 설정
+kali를 NAT로 연결 
+
+    vmnet1	vmnet8
+     win7--------fw-----------kali
+	<-----------------
+
+kali
+ route add -net  [network/prefix] gw [gateway_ip]
+ win7이 포함된 네트워크 : 192.168.1.0/24
+ gateway ip = untangle fw external ip 192.168.10.128
+
+# route add -net 192.168.1.0/24 gw 192.168.10.128
+# route
+	확인
+# ping 192.168.1.x (win7)
+
+
+@untangle (admin 암호)
+# sudo find / -name *.rules
+
+
+-----------------------------------------
+1) bind_tcp  : nc.exe
+ server/client
+
+  internal			external
+  victim---------fw--------------attacker
+  server		<-	client
+
+@win7
+cmd> nc.exe -lvp 80
+
+@kali
+# nc 192.168.1.75 80
+
+
+
+2) reverse_tcp
+ server/client
+
+  internal			external
+  victim---------fw--------------attacker
+  client		->	server
+			(port open : listen)
+
+
+IDS에서 탐지 -> 차단  : IPS
+차단된 이벤트의 SID를 확인
+2018392
+2210041
+2210051
+
+
+utm : untangle , pfsense
+1) untangle : 네트워크구성 및 ids/ips
+2) 웹서비스 (APM) 구성, 웹진단(zap) ->로그 발생
+
+금요일 : 2번 예정
+노트북
+자료 : 구글공유
+ 준비 : vmware, 웹서버OS vm, kali vm
+ (목요일까지 준비 -> 금요일 수업)
+

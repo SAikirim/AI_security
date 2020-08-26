@@ -1,0 +1,94 @@
+보안 솔루션 종류
+1. 방화벽
+ 내부망을 외부망으로부터 보호함.
+	packet filtering (IP/port)-ACL
+	stateful inspection
+2. IDS/IPS 침입탐지/방지 시스템
+ 사전에 정의된 률과 트래픽의 비교를 통해 보안 위협을 찾아냄.
+  ids : out of path방식 구현, 탐지-> 소극적대응(알람)
+  ips : inline 방식 구현, 적극적 대응(차단)
+3. Anti-DDoS 
+분산서비스 거부 공격 방어 솔루션
+4. 웹방화벽 Web Application Firewall (WAF)
+ 웹서비스에 대한 보안정책으로 웹공격 방어솔루션
+5. EMS 
+6. RMS
+7. NAC network access control 
+직원 pc(end point) 관리
+8. PMS package managment system
+폐쇄망 - 업데이트 패치
+내부 시스템이 pms를 통해서 패치/업데이트를 수행.
+내부시스템이 인터넷x
+
+-----------------------------------------------
+
+ INTERNAL------------FW----------EXTERNAL(INTERNAL)
+ (WIN7)		  |
+		  |
+		SERVERS_IN
+		(CENTOS)
+
+현재 WIN7 -> CENTOS   WEB, SSH 서비스 가능.
+
+정책1 
+   사내망 192.168.1.0/24 직원 -> 사내서버망 웹서버 192.168.2.10 로
+  웹서비스 (80, 443)만 허용하고
+   그외의 서비스 거부하는 정책
+정책2
+    사내망 192.168.1.0/24 -> 사내서버망 192.168.2.0/24
+    ssh 서비스를 거부 함.
+    단, 서버 담당자 (WIN7)만 SSH 서비스 허용
+	(IP, HOSTNAME 기준으로 담당자 허용가능)
+정책3
+   사내서버망 192.168.2.0/24 직원 -> 사내직원망 192.168.1.0/24에    접근 거부
+
+* 사내망 192.168.1.0/24 과 사내서버망 192.168.2.0/24은 인터넷은 되어야 함.
+
+정책이 여러항목일 경우, 우선순위가 중요함. (RULE ID)
+  첫번째 정책을 조건과 비교하고 맞으면 ACTION.
+  조건이 맞지않으면 아래 RULE ID로 내려가서 조건과 비교하고 맞으면 그에 대한 ACITION. 
+
+
+---------------------------------
+70.12.113.x
+예) 70.12.113.49 -> 70.12.113.149
+     70.12.113.149 -> -50  => 70.12.113.99
+cmd> ping 70.12.113.149
+ ctrl+c
+cmd> arp -a
+	70.12.113.149 목록에 있으면 사용중인 IP임.
+	사용하면 안되고 다른 IP찾아야함.
+
+각자 IP 1개 추가 선정  => 방화벽 IP사용 예정.
+
+
+VPN virtual private network 가상사설망
+ 가짜로 사설망처럼 사용 -> 사실은 공인망을 사설망처럼 사용함 -> 암호화
+
+구성하는 방식 : P2P(또는 site to site), remote access
+
+P2P		      공인망
+	(N) 본사---------ISP----------지사(N)
+	     VPN peer	         VPN peer
+
+Remote access
+		      공인망
+	(N) 본사---------ISP-----------재택근무
+	 VPN server		Client
+
+프로토콜 : L2TP, PPTP,  (거의 사용X)
+	ipsec (IP를 포함해서 암호화, ESP,AH)-터널링
+	    단점 : 사용자
+	SSL VPN : 사용자인증
+
+
+https://wiki.untangle.com/index.php/OpenVPN
+
+client vpn program
+https://openvpn.net/client-connect-vpn-for-windows/
+
+vpn 접속방법
+https://support.untangle.com/hc/en-us/articles/207304818-Deploy-the-OpenVPN-Client-to-a-Chromebook
+
+
+
