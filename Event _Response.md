@@ -230,3 +230,151 @@ cmd> nc.exe -lvp 80
  준비 : vmware, 웹서버OS vm, kali vm
  (목요일까지 준비 -> 금요일 수업)
  ```
+
+### 08/27(금요일) 수업 공유 링크
+* c11.kr/multicampusweblogs
+
+### IDS/IPS
+* 대상에 따라서
+    - HIDS/HIPS :hosted, 탐지 대상이 호스트 server의 로그, 파일, 프로세스
+        + EX) OSSEC
+    - NIDS/NIPS : 네트워크 트래픽에 대한 탐지
+        + EX) Snort, suricata
+* untangle : snort -> cisco, suricata
+    - 패턴 매칭을 이용한 룰 기반 -> 시그니처
+    - pcre 정규표현식 지원
+* 오탐(False Positive)
+    - 오탐의 원인
+        + 패틴 매칭의 한계
+        + 공격의 발생 원리나, 발생하는 트래픽의 특성을 제대로 반영하지 않는 룰
+        -> 좋은 룰을 만들어야함.
+        + 트래깃이 불규칙성, 문자 특성
+* IDS rules : 오용행위 기반 탐지
+    - 룰 : 사전에 기록된 공격 패턴
+
+```
+	원격
+공격자 - master - agent - target
+	         - agent -
+          - master - agent -
+	         - agent -
+```
+---
+port number
+ - 잘알려진 포트 0 ~1023
+ - 잘 알려지지않는 포트 1024 ~ 65535
+
+### 현재
+* https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+* Port numbers are assigned in various ways, based on three ranges: 
+    - System Ports (0-1023), 
+    - User Ports (1024-49151), and the 
+    - Dynamic and/or Private Ports (49152-65535); 
+
+* PC환경: etherent  L2 마다 data MTU최대전송단위
+    - ethernet MTU : 1500byte (tcp, IP포함)
+
+```
+cmd> ping x.x.x.x
+  icmp data size
+
+cmd> ping 70.12.113.1 -l 3000 -n 1
+
+  icmp data size 32byte+ICMP 8byte+IP 20byte=60
+
+  [icmp data 3000byte+ICMP 8byte] 단편화 +IP <=1500
+
+ 전체	3008byte
+
+	data 1472    +ICMP8	+ IP 20
+	data 1480    + IP 20
+	data 48      + IP 20	
+```
+```
+http 응답 메시지를 발송 size 클 경우
+	첫번째 data
+	두번째 data
+	...
+	마지막 data + HTTP header
+```
+---
+### 설정
+```
+Internal - Servers_in 차단 했던 방화벽 정책 비활성화
+Internal - Servers_in IP통신을 허용
+
+Kali를 NAT -> VMNET1 또는 VMNET2로 변경
+ -> 스캔 -> 와이어샤크 트래픽 확인, 로그
+
+   
+  kali 1.99 ----- fw-10.133------------------gw 10.2
+  win7 1.75----   |
+	         |
+	       2.10
+	      centos
+```
+
+## 공격 트래픽을 발생하여 확인해보자
+### 1. scaning
+툴 : nmap
+```
+@kali (192.168.1.99)
+#nmap -v -sn 192.168.1.0/24  (live scan)
+#nmap -v -A 192.168.1.75 (port scan)
+#nmap -v -sn 192.168.2.0/24
+#nmap -v -A 192.168.2.10
+```
+* 패킷 캡쳐, report - ips  - all event에서 로그확인
+```
+2010939  5432 PostageSQL scan
+2010937  3306 Mysql scan
+2010936  1521 Oracle SQL scan
+2010935  1443 MSSQL scan
+2002910  2800-2850 VNC scan
+2002911  2900-2920 VNC scan
+2003068  ssh scan outbound
+```
+
+### 2. kali -> centos   ssh 암호크랙
+@kali  
+`# ncrack -v --user root localhost:22`  
+`# ncrack -v --user test localhost:22`  
+* (세그먼트 오류시 업데이트 하기)  
+    `# apt-get install ncrack`  
+	    + y 설치
+		+ D 디폴트
+
+`# vim pass.txt`   
+    - 많이 사용하는 암호 목록  
+	```
+    passwd
+	dkagh1.
+	dkagh2.
+	P@ssw0rd
+	qwer1234
+	computer
+	security
+	passwd!
+    ```  
+`# ncrack -v --user root -P pass.txt 192.168.2.10:22`  
+
+* 패킷캡쳐, ips 로그 확인
+	- 2001219
+	- 2003068
+* @centos
+    - 로그인 실패 로그
+
+### 3. arpspoofing 
+kali : vmnet1
+win7 : vmnet1
+```
+  	win7	kali	gw(fw)
+	1.75	1.99	1.5
+
+win7에게 gw ip(1.5) -  kali mac를 전달
+	arp table     1.5 =kali
+
+gw(fw)에게 win7 ip(1.75) - kali mac를 전달
+	arp talbe	    1.75 =kali
+```
+* 패킷 캡쳐, ips event 확인
