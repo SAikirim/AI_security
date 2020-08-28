@@ -1,0 +1,332 @@
+﻿08월28일 수업메모입니다. 
+
+
+오늘의 수업 내용
+-리눅스 로그
+-아파치 웹서버 로그
+
+
+-웹서버(victim준비)
+APM설치 (PHP73, Mariadb, httpd)
+phpmyadmin 설치
+
+
+-kali가 웹서버 공격하여 로그 발생 (zap)
+
+
+-log확인
+
+
+-윈도우 로그
+-IIS 웹서버 로그 확인
+
+
+
+
+@centos
+NIC 1개만 사용 : NAT(또는 vmnet8)
+부팅
+admin (암호 dkagh1.)
+
+
+1. 고정 IP할당 192.168.10.50/24        gateway : 192.168.10.2          dns : 192.168.10.2
+
+
+$ ping 192.168.10.2
+$ nslookup www.naver.com
+$ sudo yum -y update
+
+
+APM
+apache + PHP + MariaDB (Mysql)
+
+
+phpmyadmin 4.9.5 -> 최소사양확인 필수
+https://docs.phpmyadmin.net/_/downloads/en/release_4_9_5/pdf/
+
+
+
+
+1. mariadb 설치10.4
+
+
+# vi /etc/yum.repos.d/MariaDB.repo
+ 
+#추가
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.4/centos7-amd64
+gpgkey = https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck = 1
+
+
+$ sudo yum repolist
+$ sudo  yum  install -y MariaDB
+$ sudo systemctl enable mariadb
+$ sudo systemctl start mariadb
+$ sudo /usr/bin/mariadb-secure-installation (보안설정하는 스크립트)
+        초기 root 암호 없음  엔터
+        root 암호 변경 > 2번입력  
+        anonymus사용자를 삭제 할것인지 n
+        root 원격접속 여부  : y
+        test이름의 데이터베이스를 삭제 할것인지.         y n 
+        저장여부 y
+
+
+$ sudo mysql -u root  -p 
+        암호 입력
+
+
+mysql>  show databases;
+mysql> exit
+y
+2. httpd (웹서버 설치)
+
+
+$ sudo yum install -y httpd
+
+
+
+
+3. php설치 (php73)
+$ sudo yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+$ sudo yum install -y yum-utils
+$ sudo yum-config-manager --disable remi-php54
+$ sudo yum-config-manager --enable remi-php73
+
+
+$ sudo yum install php73
+$ sudo yum install php73-php.x86_64  php-cli-7.3.8-1.el7.remi.x86_64 php73-scldevel.x86_64 php73-php-xml.x86_64   php73-php-xmlrpc.x86_64   php73-php-soap.x86_64 php73-php-process.x86_64 \
+php73-php-pgsql.x86_64  php73-php-pdo.x86_64  php73-php-opcache.x86_64 php73-php-odbc.x86_64   \
+php73-php-mysqlnd.x86_64 php73-php-mbstring.x86_64 php73-php-ldap.x86_64  \
+php73-php-ldap.x86_64  php73-php-json.x86_64  php73-php-ioncube-loader.x86_64 \
+php73-php-intl.x86_64  php73-php-gmp.x86_64 php73-php-gd.x86_64  php73-php-fpm.x86_64 \
+php73-php-devel.x86_64  php73-php-dba.x86_64  php73-php-common.x86_64 \
+php73-php-cli.x86_64  php73-php-bcmath.x86_64  php73-php-pecl-zip.x86_64 \
+php73-php-phpiredis.x86_64  php73-php-pecl-imagick* php73-php-pecl-igbinary.x86_64 \
+php73-php-pecl-igbinary-devel.x86_64 php73-php-pecl-geoip.x86_64 php73-php-pecl-xdebug.x86_64
+
+
+
+
+$ sudo ls /etc/opt/remi/php73/php.ini
+922 date.timezone = “Asia/Seoul”
+
+
+
+
+FastCGI Process Manager (FPM) 동작
+
+
+
+
+$ sudo systemctl start php73-php-fpm
+( 패키지없는 경우 설치)
+
+
+$ sudo systemctl start httpd
+$ sudo systemctl enable httpd
+
+
+웹브라우저에서 test 페이지 확인  (apache)
+php확인
+$ sudo vim /var/www/html/info.php
+        <?php  phpinfo(); ?>
+웹브라우저로 확인 http://localhost/info.php
+
+
+
+
+$ sudo firewall-cmd --permanent --zone=public --add-service=http 
+$ sudo firewall-cmd --permanent --zone=public --add-service=https
+$ sudo firewall-cmd --reload
+
+
+$ wget -P /usr/local/src https://files.phpmyadmin.net/phpMyAdmin/4.9.5/phpMyAdmin-4.9.5-all-languages.zip
+
+
+$ sudo cd /usr/local/src
+$ sudo unzip phpMyAdmin-4.9.5-all-languages.zip
+$ sudo mv /usr/local/src/phpMyAdmin-4.9.5-all-languages /usr/share/phpMyAdmin  (디렉토리이름변경함께 이동. phpMyAdmin 아래에 바로 index.php 등 파일이 있어야함.)
+
+
+도메인네임(IP) / phpmyadmin 입력시  /usr/share/phpMyAdmin 연결되도록 설정
+
+
+$ sudo vim /etc/httpd/conf.d/phpMyAdmin.conf
+
+
+Alias /phpMyAdmin /usr/share/phpMyAdmin
+
+
+<Directory /usr/share/phpMyAdmin/>
+    Require all granted
+</Directory>
+Alias /phpMyAdmin /usr/share/phpmyadmin
+
+
+보안설정 ; <Directory /usr/share/phpMyAdmin/>
+    Require all denied
+    Require ip 192.168.0.1  </Directory>
+conf 파일 확인
+$ sudo apachectl configtest
+$ sudo systemctl restart httpd
+
+
+웹브라우저로 접근해보기.
+
+
+victim 준비 완료
+
+
+
+
+centos 내에서  http://192.168.10.50 또는 http://localhost 입력시 웹페이지 확인
+ http://localhost/phpMyAdmin 하고  나와야합니다.
+
+
+1. IP 주소 확인 192.168.10.50
+2. 웹 데몬 동작 중인지 확인
+3. conf 파일 확인
+4. $ sudo vim /etc/httpd/conf.d/phpMyAdmin.conf
+        Alias /phpMyAdmin /usr/share/phpMyAdmin
+        <Directory /usr/share/phpMyAdmin/>
+            Require all granted
+</Directory>
+5. /usr/share/phpMyAdmin 디렉토리가 있어야합니다.
+6. /usr/share/phpMyAdmin 디렉토리 밑에 index.php를 비롯한 파일들이 바로 있어야 합니다.
+7. 방화벽에 http 포트 허용되어야 합니다.  sudo firewall-cmd --list-all
+
+
+
+
+
+
+
+
+attacker (kali)  NIC - NAT 연결
+ root 암호 toor
+부팅 후,   zap 실행  -> 업데이트 
+
+
+
+
+kali web----proxy(zap)----------------------------------------------centos
+              8080
+1. zap 실행 (프락시)
+2. 브라우저 proxy설정 loalhost 8080
+3. 브라우저에서 접속  공격대상 에 접속
+4. 웹브라우저로 방문한 사이트가 목록에 뜸.
+(브라우저 내에 proxy 설정 필요. localhost:8080 )
+
+
+5. 사이트 목록에서 http://192.168.10.50 선택 -> 공격 클릭
+
+
+수동으로 sql injection, xss, csrf, 다운로드, 업로드… 직접 해도 됩니다.
+
+
+
+
+centos 웹서버 로그를 windows로 빼기 (메일 발송 가능)
+
+
+apache log viewer로 로그 보기.  
+툴 : ApacheLogsViewer.exe  구글 공유에 있습니다.
+
+
+
+
+apache logs viewer
+https://www.apacheviewer.com/download/
+현재  버전 5.60
+
+
+메뉴얼
+https://www.apacheviewer.com/httpLogsViewer_Help.pdf
+
+
+
+
+침해시스템 (centos) /var/log/httpd/access_log, error_log -> win10으로 전달
+
+
+
+
+그외 취약한 웹소스 (오픈 소스 )  
+ 1) bWAPP
+  https://sourceforge.net/projects/bwapp/
+ 2) OWASP broken Web Application Project
+https://www.owasp.org/index.php/OWASP_Broken_Web_Applications_Project
+ 3) DVWA
+ http://www.dvwa.co.uk
+
+
+
+
+
+
+
+
+IIS 웹서버 로그
+log parser  (파일명 : LogParser.msi (설치) - 구글 공유)
+log parser studio (GUI-sql)  파일명 : LPSV2.D2.zip
+
+
+샘플 로그 (파일 명: W3SVC2.zip - 구글공유에 있음) 
+         주의사항 : 압축 해제 시 C:\ 아래에 해주세요. 또는 경로에 한글이 있으면 안됨.
+
+
+
+
+log parser studio에서 로그파일 불러오기 (로그유형 인식 필수)
+
+
+sql문
+1)
+        select to_string(time,'hh:mm:ss'), count(*)
+        from [파일경로=한글안됨]\ex081011.log
+        where sc-status = 404
+        group by to_string(time, 'hh:mm:ss')
+
+
+________________
+
+
+2)
+        select to_string(time,'hh:mm:ss'), count(*)
+        from [파일경로=한글안됨] \ex081011.log
+        where sc-status = 500
+        group by to_string(time, 'hh:mm:ss')
+
+
+3)
+        select to_string(time,'hh:mm:ss'), sc-status, count(*)
+        from  [파일경로=한글안됨] \ex081011.log
+        group by to_string(time, 'hh:mm:ss'), sc-status
+
+
+4)
+        select to_string(time,'hh:mm'), sc-status, count(*)
+        from [파일경로=한글안됨]
+        group by to_string(time, 'hh:mm'), sc-status
+
+
+5)
+select c-ip, count(*)
+ from [파일경로=한글안됨] \ex081011.log
+where sc-status = 404
+and to_string(time, 'hh:mm') >= '02:30'
+and to_string(time, 'hh:mm') <= '07:00'
+group by c-ip
+order by count(*) desc
+
+
+6)
+select extract_filename(cs-uri-stem), count(*)
+ from [파일경로=한글안됨] \ex081011.log
+where sc-status = 404
+and to_string(time, 'hh:mm') >= '02:30'
+and to_string(time, 'hh:mm') <= '07:00'
+group by extract_filename(cs-uri-stem)
+order by count(*) desc
