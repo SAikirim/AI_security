@@ -187,6 +187,7 @@ theFlower go go go!
         + 브라우저를 종료하거나 set-cookie로 cookie가 클리어시 만료
         * 사용자 접속시 인증정보 유지를 위하여 사용(로그인 등)
 * Set-Cookie
+  
     - 쿠키이름:쿠키값;Exipires=날짜;Path=경로;Secure,HttpOnly
 
 ---
@@ -365,6 +366,7 @@ lecture
 
 * ' and '1'='1 
 * ' and '1'='1'
+
 ==========================================
 ### SQL MAP
 ```

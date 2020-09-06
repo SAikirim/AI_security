@@ -1,0 +1,15 @@
+참고 : https://ruuci.tistory.com/6
+
+ssh-keygen -t rsa -f ~/.ssh/rsa-gcp-key  -C "crew1"	# 권세아 
+ssh-keygen -t rsa -f ~/.ssh/rsa-gcp-key  -C "crew2"	# 한현정
+  - 공개키, 비밀키 생성
+
+cat ~/.ssh/rsa-gcp-key.pub
+ - 공개키 확인
+  - 공개키를 복사하셔서 알려주시면 제가 GCP에 등록하겠습니다.
+
+ssh -i ~/.ssh/rsa-gcp-key crew1@34.64.88.52 
+ssh -i ~/.ssh/rsa-gcp-key crew2@34.64.88.52 
+  - 개인키를 이용해 접속 가능
+http://34.64.88.52/dvwa
+  - 웹서버

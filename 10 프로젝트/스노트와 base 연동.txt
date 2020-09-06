@@ -1,0 +1,29 @@
+﻿apmsetup7 설치
+
+PHP와 데이터베이스 연동을 위한 ADOdb를 다운로드 후 
+  C:\APM_Setup\htdocs 폴더에 복사
+
+BASE 다운로드 받아 압축을 푼 다음, C:\APM_Setup\htdocs\base 폴더에 복사
+
+C:\APM_Setup\htdocs\base\includes\base_action.inc.php 파일을 열어서
+
+include_once("Mail.php"); // r.rioux added for PEAR::Mail
+include_once("Mail/mime.php"); //r.rioux added for PEAR::Mail attachments
+
+-> 둘다 주석처리, 또는 지우기
+
+웹 브라우저를 통해 http://127.0.0.1/base로 접근
+<Continue>를 눌러 5단계 설정 화면 확인
+
+1단계 : ABODB 경로 입력(‘C:\APM_Setup\htdocs\adodb5’)
+2단계 : 데이터베이스 관련 정보 설정     
+Database Name : snort
+Databse Host : localhost
+Database User Name : root
+Database Password : apmsetup
+
+3단계 : BASE에 사용할 계정 생성 - 그냥 넥스트 
+4단계 : BASE에 사용하는 데이터베이스 테이블 생성  - 버튼 누르기
+5단계 : 3단계에서 생성한 아이디와 패스워드 입력 (넥스트 했으니 인증없다.)
+
+스노트 콘솔 출력이아니고 db에 저장되도록 재실행

