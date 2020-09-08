@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int Temp(int a)
+{
+	int b = 1;
+	if (a == 1)
+	{
+		b++;
+	} else if (a < 1) {
+	
+	} else {
+		b--;
+	}
+	return b;
+}
+
+int main(int argc, char* argv[])
+{
+	int result = 0;
+	result = Temp(1);
+	printf("result:%d\n",result);
+	return 0;
+}
