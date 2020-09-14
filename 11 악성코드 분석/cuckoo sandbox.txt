@@ -1,0 +1,49 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install open-vm-tools
+
+sudo apt-get install python python-pip python-dev libffi-dev libssl-dev
+sudo apt-get install python-virtualenv python-setuptools
+sudo apt-get install libjpeg-dev zlib1g-dev swig
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
+
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
+
+sudo apt update
+sudo apt install -y mongodb-org
+
+sudo service mongod start
+sudo systemctl enable mongod.service
+
+sudo apt-get install tcpdump apparmor-utils
+sudo aa-disable /usr/sbin/tcpdump
+sudo apt-get install tcpdump
+sudo setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
+sudo getcap /usr/sbin/tcpdump
+
+sudo apt-get install volatility
+
+sudo pip install m2crypto
+
+sudo pip install cuckoo
+sudo pip install -U cuckoo
+cuckoo -d
+mkdir /home/nobreak/.cuckoo
+cuckoo community
+  # 만약 "Requires: Python >=3.7" 한다면
+    - sudo pip install -U pip setuptools twine
+
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+
+sudo sh -c 'echo "deb http://download.virtualbox.org/virtualbox/debian $(lsb_release -sc) contrib" >> /etc/apt/sources.list.d/virtualbox.list'
+
+sudo apt update
+sudo apt-get install virtualbox-5.2
+
+sudo apt-get install net-tools
+
+
+
+
