@@ -1,0 +1,168 @@
+﻿TEXTVIEW 와 Graph  화면 전환 :  space bar
+string window : shift + f12
+함수 이동 :  ctrl + p
+이름 검색 : ctrl + L
+XREF 검색 : ctrl + x
+주소 이동 : g
+전단계 이동 : ESC
+코드 수정 : alt + f2
+text  검색 : alt + t
+Quick view : ctrl + 1
+binary 검색 alt + b
+HEX-rays: F5
+
+=========================================
+1. Imports 윈도우를 이용해 gethostbyname을 탐색해보자. 임포트 위치는 어디인가?
+* import tab  목록 gethostbyname 확인 -> 더블클릭 ->  data section  에서 XREF 검색 -> 사용되는 함수 목록 확인 
+ - .idata:100163cc
+
+2. gethostbyname 함수는 몇번 호출되는기?
+* 위 과정에서 XREF 검색 시  P 호출 w 쓰기  r read  중 p 로 나오는 목록과 함수 주소 확인
+- 9번
+
+3. 0x10001757에 위치한 gethostbyname 호출을 보면 어떤 DNS 요청이 이뤄지는지 알 수 있는가?
+- EAX  .data_10019040   
+- pics.praticalmalwareanalys
+
+
+4. 0x10001656 서브루틴에서 IDA Pro는 지역변수 몇개를 인지하고 있는가?
+ - 1개( 자기 자신)
+   0x10001656 서브루틴에서 IDA Pro는 파라미터 몇개를 인지하고 있는가?
+- 23개
+
+5. Strings 윈도우를 이용해 디스어셈블리 내의 문자열 \cmd.exe /c를찾아보자. 어디에 있는가?
+xdoors_d 섹션의 0x10095B34     <---  C \\cmd.exe /c 
+
+
+6. \cmd.exe /c를 참조하는 코드 영역에서 무슨 일이 발생하는가?
+  - 프로세스를 생성하는 소켓을 생성하기 위해 (IP 정보를 받아오는 과정)
+  - 원격 세션 연결 시 디렉터리 정보 받아오는 과정
+  - memcmp ( cammandline 입력할 수 있는 명령 정의)
+  
+* __IDA 기능 위주의 분석 통해 흐름을 파악하고 좁혀나가는 분석을 해야 한다.__
+
+
+7. 같은영역 0x100101C8에서 dword_1008E5C4는 경로를 지정하는 전역 변수로 보인다.
+   악성코드는 어떻게 dword_1008E5C4를 설정하는가? (힌트 : 상호참조 이용)
+- GetVersionExA 함수를 통해 운영체제 버전 저장
+ 
+
+Tip. CMP 그리고 JUMP (JA vs JB vs JE vs JZ)
+
+1) CMP
+
+CMP는 묵시적으로 Op1(Destincationm, 피연산자)에서 Op2(Source, 소스피연산자)와의 뺄셈을 수행 ex) CMP Op1, Op2
+
+그리고 어떤 피연산자도 수정되지 않지만, 뺄셈을 수행하다보니 플래그를 수정합니다.
+
+- Op1 - Op2 < 0, ZF=0 CF=1
+
+- Op1 - Op2 > 0, ZF=0 CF=0
+
+- Op1 - Op2 = 0, ZF=1 CF=0
+
+2) JUMP
+
+JMP와 관련된 명령어는 매우 많지만 이번 문제에서 자주 쓰이는 Jump 명령어를 정리합니다.
+
+- JA : Jump if Above / CMP로 두 값을 비교하여 Op1(왼쪽) 크면 Jump  /  ZF = 0  and  CF = 0
+
+- JB : Jump if Below / CMP로 두 값을 비교하여 Op2(오른쪽) 크면 Jump  /  CF = 1
+
+- JE : Jump if Equal / CMP로 두 값을 비교하여 Op1, Op2 값이 같으면 Jump  /  ZF = 1
+
+- JZ : Jump if Zero / 결과값이 0이면 Jump / ZF = 1
+
+- JNZ : Jump if not Zero / 결과값이 0이 아니면 Jump / ZF = 1
+
+ 
+
+Tip. CMP 이전에 수행하는 XOR EAX, EAX 명령어
+
+XOR 명령어는 Overflow와 Carry 플래그를 항상 0으로 해제합니다.
+
+또한 EAX는 서로다른 값일때만 1로 세팅되므로,
+
+XOR EAX, EAX를 수행할 경우, 서로가 같은 값을 가지므로 0으로 초기화됩니다.
+
+CMP이전에 수행되는 해당 명령어는 초기화를 위해 사용됩니다.
+
+ 
+
+Tip. 함수에서 돌아온 이후 수행하는 TEST EAX, EAX 명령어
+
+예를들어, memcmp 함수가 수행된 이후에 TEST EAX, EAX를 수행한다면 어떤 의미일까요?
+
+TEST 명령어는 묵시적으로 두 피연산자의 대응되는 각 비트 쌍에 대해 AND 연산자를 수행하고,
+
+결과에 따라서 플래그를 설정합니다. 또한 TEST 명령어는 연산자에 어떤 영향을 주지 않습니다.
+
+하지만 이러한 글을 다 기억하는 것보다는, 자주 쓰이는 사례의 의미를 기억하는게 더 효율적이겠지요.
+
+- CMP명령어는 두 OP가 동일한지를 판단하며
+
+- TEST명령어는 두 OP가 모두 0인지 판단합니다.
+
+즉 위에서 예로든 memcmp 함수가 시행된 이후에 EAX값에 리턴값이 설정되어 있을것이고
+
+TEST명령으로 해당 값이 0인지 확인하는데 사용됩니다.
+
+즉, memcmp로 비교한 문자열이 동일한가? 라는것을 TEST 명령어로 체크하는겁니다.
+
+
+8. 0x1000FF58에서 서브루틴으로 수백 라인은 문자열을 비교하기 위한 일련의 memcmp 비교다.
+      robotwork 와 문자열 비교가 성공적으로 이뤄지면 무슨 일이 일어나는가? (memcmp가 0을 반환)
+shift + f12 
+
+- robotwork 문자는 어는 섹션에 존재하는가? : xdoors_d:10095ad8
+- robotwork 이용하는 주소는 어디인가? : .text:10010444
+- 문자열이  robotwork 동일하게 되면 어느 주소로 이동하게 되는가?  : .text:10010461(sub_100052a2)
+- 관련된  registry  정보에  무슨 정보를 전송하는가?  : 윈도우 CurrentVersion 정보
+  * HKLM\SOFTWARE\\Microsoft\\Windows\\CurrentVersion   worktime  , worktimes 
+
+
+9. PSLIST 익스포트는 무슨 역할은 하는가?
+ - 운영체제 종류 체크 및 dwMajorVersion 체크 후, 어떤 프로세스를 실행함
+
+10. 그래프 모드를 이용해 sub_10004E79 상호 참조 그래프를 그려보자.
+* view -> graph -> XREFS from  
+
+
+11. DLLMain 이 함수에 진입하기 위해 호출하는 API함수는 무엇인가?
+* VIEW -> graph -> USER XREFS CHART ->   recusion depth  값 1로 설정 
+
+15. 0x10001701 에서 소켓을 호출한다.  세가지 파라미터는 무엇인가? 
+     6 1 2
+	
+	
+17. 명령어 옵코드 0xED의 사용법을 찾아보자. 이 명령어는 VMware 탐지를 수행하는 VMXh
+
+      매직 문자열로 사용한다. 이 악성코드는 이를 이용하고 있는가?
+
+      VMware를 탐지하는 다른 증거가 있는가?
+
+	in  : input from port 
+	 - 포트에서 한 바이트나 워드를 AL 또는 AX 로 입력한다.
+	 - 소스 피연산자는 포트 주소로서 8bit  상수나 DX 에 16bit 주소로 표현된다.
+	 - IA-32 에서는 더블워드가 포트를 통해 EAX에 입력될 수 있다.
+	 - 명령어 형식 : in accum, imm 또는 in accum, DX 
+	 
+	 대략 정리 하면 VMXh  문자열은 VM을 탐지 하기 위한 다양한 방법중 하나
+	 원리는 가상머신 환경에서 guest  와 host 간의 통신채널을 확인
+	 intel x86 환경에서 I/0 작업을 수행하기 위해서는 IN 과 OUT 명령어를 사용하며 
+	 VMHx  문자열은 가상머신 환경에서 in  명령에 의해 생성되는 Host와 Guest 간의 고유한 통신 채널을 의미
+	 
+	 
+
+
+
+
+
+
+
+
+
+
+
+
+

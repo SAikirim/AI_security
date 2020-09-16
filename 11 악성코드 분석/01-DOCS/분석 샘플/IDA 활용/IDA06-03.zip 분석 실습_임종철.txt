@@ -1,0 +1,99 @@
+﻿기초 분석 내용 
+
+1. 알려진 여부 체크
+- 해시값 : 75eb05679a0a988dddf8badfc6d5996cc7e372c73e1023dde59efbaab6ece655
+- 바이러스토탈에서 45개의 백신이 악성코드로 인식함, Lab06-03.exe로 이름을 인식함
+
+2. PE구조 , 패킹 여부 체크 
+- Entry Point		4770
+- Contained Sections	3
+Name	Virtual Address	VirtualSize	RawSize	Entropy	MD5
+.text	4096		19304		20480	6.43	e00650c989386ab5fe734018b3f3cbf6
+.rdata	24576		2560		4096	3.82	33e1d3dc1399ee5ce69bdf827cd34a7a
+.data	28672		16296		12288	0.83	b950d5a4b7c23321c928ed07c839b6ed
+- not 패킹, Microsoft Visual C++ 6.0로 컴파일함
+
+3. DLL 체크
+* Imports
+	- ADVAPI32.dll : 레지스터를 만들고, 값을 세팅함
+		RegOpenKeyExA 
+		RegSetValueExA
+	- KERNEL32.dll :
+		GetLastError 
+		HeapFree 
+		GetStdHandle 
+		LCMapStringW 
+		SetHandleCount 
+		GetOEMCP 
+		LCMapStringA 
+		CopyFileA 				: 파일 복사
+		ExitProcess 
+		FlushFileBuffers 
+		GetEnvironmentStringsW 
+		GetVersionExA 			: 버전확인
+		GetModuleFileNameA 
+		RtlUnwind 
+		LoadLibraryA 
+		FreeEnvironmentStringsA 
+		GetCurrentProcess 
+		GetEnvironmentStrings 
+		CreateDirectoryA 
+		DeleteFileA 			: 파일 삭제
+		GetCPInfo 
+		UnhandledExceptionFilter 
+		MultiByteToWideChar 
+		FreeEnvironmentStringsW 
+		GetCommandLineA 		: 현재 프로세스에 대한 명령 줄 문자열을 검색
+		GetProcAddress 			: 메모리에 로드된 DLL에서 함수의 주소를 검색,  PE파일 헤더에서 가져온 함수 외에 다른 DLL에서 함수를 가져오는데 사용됨
+		SetStdHandle 
+		SetFilePointer 
+		WideCharToMultiByte 
+		GetStringTypeA 
+		GetModuleHandleA 
+		WriteFile 
+		GetStartupInfoA 
+		CloseHandle 
+		GetACP 
+		HeapReAlloc 
+		GetStringTypeW 
+		TerminateProcess 
+		GetEnvironmentVariableA 
+		HeapCreate 
+		VirtualFree 
+		HeapDestroy 
+		Sleep 
+		GetFileType 
+		HeapAlloc 
+		GetVersion 
+		VirtualAlloc
+	- WININET.dll : 인터넷 상태를 확인하며, 접속한 인터넷의 데이터를 읽음
+		InternetReadFile 
+		InternetOpenUrlA 
+		InternetCloseHandle 
+		InternetOpenA 
+		InternetGetConnectedState
+
+4. string 체크 
+.data:00407048 0000001E C Success: Internet Connection\n
+.data:004070C4 0000002F C http://www.practicalmalwareanalysis.com/cc.htm
+.data:004070F4 0000001A C Internet Explorer 7.5/pma
+.data:00407168 00000008 C Malware
+.data:00407170 0000002E C Software\\Microsoft\\Windows\\CurrentVersion\\Run	: 레지스터에 자동 실행으로 등록
+.data:004071A0 0000000F C C:\\Temp\\cc.exe        : 임시 파일에서 어떤 파일을 실행
+------------------------------------
+정적(코드) 분석
+
+1.  main이 호출한 함수는 무엇인가?
+
+2. sub_401130 함수는 어떤 인자를 갖는가?
+
+3. 이 함수가 가지는 주요 코드 구조는 무엇인가?
+
+4. 이 함수는 무슨 일을 하는가?
+
+5. 이 악성코드에서 호스트 기반의 행위(indicator)가 존재하는가?
+
+6. 이 악성코드의 목적은 무엇인가?
+
+-------------------------------------
+동적 분석
