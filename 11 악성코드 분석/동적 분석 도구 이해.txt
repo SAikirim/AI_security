@@ -1,0 +1,65 @@
+프로그램의 동작 과정
+
+
+	PPID 부모프로세스   -> fork()   PID , MEMORY -> PAGE IN  
+					     
+				DLL ,  handle ( MUTEX, mutant , KEY (regstry), 소켓, 디렉토리, 파일 )
+
+				event log ( create process, create thread, create socket 등)
+				소켓 오픈시 
+				port -> service -> process
+	
+
+	process explorer 
+			PPID, PID , strings, DLL, handle 
+	process monitor
+			필터링 기능이 있어서  프로그램을 실행 하기 전에 regstry , 파일  등의 정보를
+			프로그램 실행 시 필터링 해서 필요한 부분만 용이하게 분석할 수 있게 도움을 줌
+
+	tcpview
+			소켓 오픈시 
+			port -> service -> process 
+			shvchost 같은 프로세스는 보통  dll 통해 서비스가되는 건데 실제 동작 시키는 
+			정보를 보기위해서는 process explorer 랑 같이 사용해야한다.
+	autoruns
+			regstry 는 응용프로그램의 database 인데
+			autoruns 는 그 regstry 목록 중 부팅 시 자동으로 시작 할 수 있는 regstry  정보만
+			따로 보여준다.    즉 malware 의  presistent 기능을 체크해볼 수 있다.
+
+
+
+	port -> service -> process
+	
+	cmd >  netstat -ano  | findstr  :포트번호   <==   열린 포트 번호와 관련된 PID
+	TCPVIEW .EXE
+	
+	process explorer 를 이용해서 PID 를 확인 후 그 PID 의 dll 정보와 handle 정보를 확인
+
+	listener socket 를 오픈 하였을때 *    들어오는 연결을 받기 위해 대기중이다.
+	*  소켓이 어디에서나 연결할 준비가 되었음을 의미  
+ 	이렇게 있다가   호스트 이름 , ip 주소가 표시되면 해당 연결만 허용.
+
+
+	sysanalyzer
+		http://sandsprite.com/iDef/SysAnalyzer/
+		동적 분석 자동화 도구 
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+			

