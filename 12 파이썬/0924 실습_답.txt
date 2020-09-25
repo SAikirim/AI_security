@@ -1,0 +1,823 @@
+﻿함수 실습
+
+다음에 있는 명부편집을 코딩해보시오.
+
+명부편집
+1.정보 입력
+2.정보 확인
+3.정보 수정
+4.나가기
+
+1.정보 입력 선택시
+이름 :
+성별 :
+생년월일 : 
+전화번호 : 
+지역 :
+
+
+2.정보 확인
+이름으로 선택 => 함수 설정
+
+이름 : XXX
+
+성별 : 남/여 => 별도로 입력하지 않는한 남으로 되도록 하시오.
+
+나이 : 생년월일 입력시 자동으로 계산되서 입력되도록 할 것(기준 2020년)
+
+생년월일 : XXXX/XX/XX
+=> 어떻게 입력하든 XXXX/XX/XX 로 입력되도록 할 것 (함수 설정)
+   77-02-21 로 입력해도 1977/02/21로 되도록
+
+전화번호 : 010-XXXX-XXXX
+=> 어떻게 입력하든 010-XXXX-XXXX 로 입력되도록 할 것 (함수 설정)
+   010 9119 1548 로 입력했어도 010-9119-1548로 되도록
+
+지역 : XXX
+
+3. 정보 수정 
+이름으로 선택
+
+원하는 항목 선택
+1.생년월일
+2.전화번호
+3.지역
+
+힌트1 - [{'a':1,'b':2},{'a':3,'b':4}]
+힌트2 - 딕셔너리 복사 방법 
+	dic2=dic1.copy()
+
+def name_input(name,se=True):
+    if se==True:
+        se1='male'
+    else:
+        se1=se
+    return name,se1   
+    
+    
+
+def birth_input(birthday):
+    if birthday[2] not in "01234567890":
+        if int(birthday[0]+birthday[1]) <=20:
+            birthday = '20'+birthday
+        else:
+            birthday = '19'+birthday
+    elif len(birthday) == 6:
+        if int(birthday[0]+birthday[1]) <=20:
+            birthday = '20'+birthday
+        else:
+            birthday = '19'+birthday
+    if birthday[4] in "01234567890":
+        save_birth1 = birthday[:4]+'/'+birthday[4:6]+'/'+birthday[6:]
+        return save_birth1
+    elif birthday[4] == "/":
+        return birthday
+    else:
+        save_birth1 = birthday.replace(birthday[4],'/')
+        return save_birth1
+
+def age_input(birthday):
+    age=2020-int(birthday[0:4])+1
+    return age
+    
+def tel_input(tel):
+    if tel[3] in "0123456789":
+        tel_list=list(tel)
+        tel_list.insert(3,'-')
+        tel_list.insert(8,'-')
+        tel1=""
+        for i in tel_list:
+            tel1=tel1+i
+        return tel1
+
+    elif tel[3] != '-':
+        tel1 = tel.replace(tel[3],'-')
+        return tel1
+    else:
+        return tel
+        
+
+def human_find(findname):
+    for i in range(len(human_list)):
+        if findname in human_list[i].values():
+            return i
+        
+
+def add_save():
+    a=input("추가로 수정하시겠습니까?(y or n) : ")
+    if a == 'n' :
+        return 0
+    else:
+        return 1
+
+human_list=[]
+human_list1=[]
+human_dic={}
+
+MENU='''
+명부편집
+1.정보 입력
+2.정보 확인
+3.정보 수정
+4.나가기
+'''
+
+while 1:
+    print(MENU)
+    choice=input("항목을 선택하시오 : ")
+    print("")
+    if choice not in "1234":
+        print("잘못입력하셨습니다. 다시 선택해주세요")
+        continue
+    if choice == '4':
+        print("종료합니다.")
+        break
+    if choice == '1':
+        index1=0
+        index2=1
+        name=input("이름 : ")
+        se=input("성별 : ")
+        if se=="":
+            name,se=name_input(name)
+        else:
+            name,se = name_input(name,se)
+        birthday= birth_input(input("생년월일 : "))
+        age=age_input(birthday)
+        tel=tel_input(input("전화번호 : "))
+        area=input("지역 : ")
+        human_dic['이름']=name
+        human_dic['성별']=se
+        human_dic['생년월일']=birthday
+        human_dic['나이']=age
+        human_dic['전화번호']=tel
+        human_dic['지역']=area
+        human_dic2=human_dic.copy()
+        human_list.append(human_dic2)
+        print("")
+        print(human_list)
+        print("")
+    if choice == '2':
+        findname = human_find(input("이름검색 : "))
+        print("")
+        find_dic=human_list[findname]
+        print("")
+        for i,j in find_dic.items():
+            print("{} : {}".format(i,j))
+        print("")
+    if choice == '3':
+        findname = human_find(input("이름검색 : "))
+        find_dic=human_list[findname]
+        while 1:
+            choice1=input('''
+1.생년월일
+2.전화번호
+3.지역
+
+수정하고자 하는 항목을 적으시오 : ''')
+            print("")
+            if choice1 == '1':
+                save_birth=birth_input(input("생년월일 : "))
+                print("")
+                save_age=age_input(save_birth)
+                find_dic["생년월일"]=save_birth
+                find_dic["나이"]=save_age
+                for i,j in find_dic.items():
+                    print("{} : {}".format(i,j))        
+                a=add_save()
+                if a==0:
+                    break
+                else:
+                    continue
+            if choice1 == '2':
+                save_tel = tel_input(input("전화번호 : "))
+                print("")
+                find_dic["전화번호"]=save_tel
+                for i,j in find_dic.items():
+                    print("{} : {}".format(i,j))        
+                a=add_save()                
+                if a==0:
+                    break
+                else:
+                    continue
+            if choice == '3':
+                save_area = input("지역 : ")
+                print("")
+                find_dic["지역"]=save_area
+                for i,j in find_dic.items():
+                    print("{} : {}".format(i,j))        
+                a=add_save()
+                
+                if a==0:
+                    break
+                else:
+                    continue
+            print("")  
+
+-------------------------------------------------------------------
+
+def test(list1,list2):
+	list3=[]
+	for i in list1:
+		for j in list2:
+			list3.append(i*j)
+	return list3
+
+를 lambda 로 작성해보시오.
+
+test1=lambda list1,list2: [x*y for x in list1
+			       for y in list2]
+
+-------------------------------------------------------------------
+
+파일 관리 실습
+
+1.금일 실습한 명부 내용을 이름,성별,생일,전화번호,지역 순으로 계속해서 업데이트 되도록 저장한 후에 파일을 읽어드려서 파일 전체 내용을 리스트화 해서 출력하시오.
+ex)
+이가,남,1990/01/01,010-1111-1111,서울
+김나,여,1991/02/02,010-2222-2222,대구
+이다,남,1992/03/03,010-3333-3333,부산
+박라,남,1993/04/04,010-4444-4444,서울
+
+        human_dic['이름']=name
+        human_dic['성별']=se
+        human_dic['생년월일']=birthday
+        human_dic['나이']=age
+        human_dic['전화번호']=tel
+        human_dic['지역']=area
+	with open('info.txt','a') as f1:
+		f1.write("{},{},{},{},{}\n".format(name,se,birthday,tel,area))
+        human_dic2=human_dic.copy()
+        human_list.append(human_dic2)
+ 
+
+2. 1번에 파일 내용 중에서 지역이 '서울'인 라인만 출력해보시오.(hint:find())
+
+with open("info.txt",'r') as f1:
+	info_list=f1.readlines()
+
+for info in info_list:
+	if info.find("서울") >=0:
+		print(info)
+
+	or
+
+	if info.count("서울") >0:
+		print(info)
+
+	or
+
+	if "서울" in info:
+		print(info)		
+
+===========================================================================
+
+클래스 실습
+
+게임 케릭들을 만들어보시오.
+
+1. 힘,민첩,지능 수치를 입력하도록 하시오. (힘,민첩,지능 합이 30이 넘지 않도록 할 것)
+
+2. 직업을 힘,민첩,지능 중 힘이 많으면 전사, 민첩이 많으면 도적, 지능이 많으면 마법사 정해지도록 할 것
+
+3. 전사로 선택되면 베기,찌르기,대쉬 중에서 스킬을 선택하도록 하고
+   도적으로 선택되면 암살,은신,훔치기 중에서 스킬을 선택하도록 하고
+   마법사로 선택되면 불,물,바람 중에서 스킬을 선택하도록 하시오.
+
+#case1
+
+class Cha:
+    def __init__(self,st,dex,inte):
+        self.st=st
+        self.dex=dex
+        self.inte=inte
+
+    def state_define(self):
+        if self.st+self.dex+self.inte==30:
+            return 1
+        else:
+            return 0
+
+    def cha_state(self):
+        if self.st > self.dex and self.st > self.inte:
+            job = '전사'
+        elif self.dex > self.st and self.dex > self.inte:
+            job = '도적'
+        else:
+            job = '마법사'
+        return job
+
+class Skill(Cha):
+    def skill(self,job):
+        if job == '전사':
+            skill1='베기'
+            skill2='찌르기'
+            skill3='대쉬'
+        elif job == '도적':
+            skill1='암살'
+            skill2='은신'
+            skill3='훔치기'
+        else:
+            skill1='불'
+            skill2='물'
+            skill3='바람'
+        
+        skillchoice=input('''
+다음중에서 스킬을 선택하세요.
+1.{}
+2.{}
+3.{}
+선택하세요 : '''.format(skill1,skill2,skill3))
+        if skillchoice == '1':
+            return skill1
+        if skillchoice == '2':
+            return skill2
+        else:
+            return skill3
+cha_name=input("케릭명을 적으시오.:")    
+while True:
+    st=int(input("원하는 힘을 적으시오. : "))
+    dex=int(input("원하는 민첩을 적으시오. : "))
+    inte=int(input("원하는 지능을 적으시오. : "))
+    choice=Skill(st,dex,inte)
+    i=choice.state_define()
+    if i == 1:
+        break
+    else:
+        print("다시 스테이트를 정해주세요.")
+        continue
+        
+job=choice.cha_state()
+skills=choice.skill(job)
+
+print('''
+케릭명:{}
+직업:{}
+힘:{}
+민첩:{}
+지능:{}
+스킬:{}
+'''.format(cha_name,job,st,dex,inte,skills))
+
+
+#case2
+
+
+def state_define(st,dex,inte):
+    if st+dex+inte==30:
+        if st > dex and st > inte:
+            return 1
+        elif dex > st and dex > inte:
+            return 1
+        elif inte > dex and inte > st:
+            return 1
+        else:
+            return 0
+    else:
+        return 0
+
+def cha_state(st,dex,inte):
+    if st > dex and st > inte:
+        job = '전사'
+    elif dex > st and dex > inte:
+        job = '도적'
+    else:
+        job = '마법사'
+    return job
+
+
+
+class Cha:
+    
+    def skillchoice(self,skills):
+        skillchoice=input('''
+다음중에서 스킬을 선택하세요.
+1.{}
+2.{}
+3.{}
+선택하세요 : '''.format(skills[0],skills[1],skills[2]))
+        if skillchoice == '1':
+            return skills[0]
+        elif skillchoice == '2':
+            return skills[1]
+        else:
+            return skills[2]
+
+class Knight(Cha):
+    skills=['베기','찌르기','대쉬']  
+
+class Thief(Cha):
+    skills=['암살','은신','훔치기']
+        
+class Wizard(Cha):
+    skills=['불','물','바람']
+        
+cha_name=input("케릭명을 적으시오.:")    
+while True:
+    st=int(input("원하는 힘을 적으시오. : "))
+    dex=int(input("원하는 민첩을 적으시오. : "))
+    inte=int(input("원하는 지능을 적으시오. : "))
+    i=state_define(st,dex,inte)
+    if i == 1:
+        break
+    else:
+        print("다시 스테이트를 정해주세요.")
+        continue
+job=cha_state(st,dex,inte)
+if job=='전사':
+    knight=Knight()
+    skill_list=knight.skills
+    skill=knight.skillchoice(skill_list)
+if job=='도적':
+    thief=Thief()
+    skill_list=Thief.skills
+    skill=Thief.skillchoice(skill_list)
+if job=='마법사':
+    wizard=Wizard()
+    skill_list=wizard.skills
+    skill=wizard.skillchoice(skill_list)
+    
+print('''
+케릭명:{}
+직업:{}
+힘:{}
+민첩:{}
+지능:{}
+스킬:{}
+'''.format(cha_name,job,st,dex,inte,skill))
+
+
+-----------------------------------------------------------------------
+
+4칙연사 계산기 5대 운영(1,2,3,4,5)
+
+메뉴
+1.계산하기
+2.각 계산기의 마지막 결과 확인
+
+1.계산하기
+
+계산기선택:(1,2,3,4,5 중에 택일)
+
+num1:
+num2:
+기호: 
+(정수와 실수외에는 입력이 되지않도록 설정)
+나누기 같은 경우에는 자식 클래스를 만들어서 분모가 0일 때 결과값이 0이 되도록 메소드 오버라이드 할 것
+
+2. 각 계산기의 마지막 결과 확인
+
+계산기선택:(1,2,3,4,5 중에 택일)
+
+
+def numfind(i):
+    while True:
+        num=input("number{} : ".format(i))
+        a=0
+        for c in num:
+            if c not in "0123456789.":
+                print("숫자로 다시 입력해주세요")
+                a=1
+                break
+            elif num.count('.') > 1:
+                print("숫자로 다시 입력해주세요")
+                a=1
+                break
+        if a==1:
+            continue
+        if num.count('.') ==1:
+            return float(num)
+        else:
+            return int(num)
+
+        
+
+class Fourcal:
+    def __init__(self,num1,num2,cal):
+        self.num1=num1
+        self.num2=num2
+        self.cal=cal
+        self.result=0
+        
+    
+    def fourcal(self):
+        if self.cal == '+':
+            self.result=self.num1+self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+    
+        if self.cal == '-':
+            self.result=self.num1-self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+            
+        if self.cal == '*':
+            self.result=self.num1*self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+
+    def div(self):
+        if self.cal == '/':
+            self.result=self.num1/self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+    
+
+class safeFourcal(Fourcal):
+        
+    def div(self):
+        if self.num2==0:
+            self.result=0
+            print("분모가 0입니다.")
+            
+        else:
+            self.result=self.num1/self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+            
+while True:
+    menu1=input('''메뉴
+1.계산하기
+2.각 계산기의 마지막 결과 확인
+3.나가기
+
+선택하시오. : ''')
+    print("")
+    if menu1 == '3':
+        break
+    while True:
+        if menu1 =='1':
+            calnum = input('계산기를 선택하시오.(1,2,3,4,5 중에서 선택): ')
+            i=1
+            num1 = numfind(i)
+            num2 = numfind(i+1)
+            cal=input("기호 : ")
+            if calnum == '1':
+                a1=safeFourcal(num1,num2,cal)
+                if a1.cal == '/':
+                    a1.div()
+                else:
+                    a1.fourcal()
+                                    
+            if calnum == '2':
+                a2=safeFourcal(num1,num2,cal)
+                if a2.cal == '/':
+                    a2.div()
+                else:
+                    a2.fourcal()
+                
+            if calnum == '3':
+                a3=safeFourcal(num1,num2,cal)
+                if a3.cal == '/':
+                    a3.div()
+                else:
+                    a3.fourcal()
+               
+            if calnum == '4':
+                a4=safeFourcal(num1,num2,cal)
+                if a4.cal == '/':
+                    a4.div()
+                else:
+                    a4.fourcal()
+                
+            if calnum == '5':
+                a5=safeFourcal(num1,num2,cal)
+                if a5.cal == '/':
+                    a5.div()
+                else:
+                    a5.fourcal()
+
+            print("")        
+            break
+        else:
+            calnum = input('계산기를 선택하시오.(1,2,3,4,5 중에서 선택): ')
+            print("")
+            if calnum == '1':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a1.result))
+
+            if calnum == '2':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a2.result))                
+            if calnum == '3':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a3.result))               
+            if calnum == '4':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a4.result))                
+            if calnum == '5':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a5.result))
+            print("")    
+            break    
+
+
+
+============================================================================
+
+모듈 실습
+
+금일 클래스 실습 두번째 문제에서 클래스 부분을 모듈로 만들고 모듈을 실행하는 식으로 본문 코드를 수정해보시오.
+
+본문 cal.py
+
+모듈 calsub.py
+
+#calsub.py
+
+def numfind(i):
+    while True:
+        num=input("number{} : ".format(i))
+        a=0
+        for c in num:
+            if c not in "0123456789.":
+                print("숫자로 다시 입력해주세요")
+                a=1
+                break
+            elif num.count('.') > 1:
+                print("숫자로 다시 입력해주세요")
+                a=1
+                break
+        if a==1:
+            continue
+        if num.count('.') ==1:
+            return float(num)
+        else:
+            return int(num)
+
+        
+
+class Fourcal:
+    def __init__(self,num1,num2,cal):
+        self.num1=num1
+        self.num2=num2
+        self.cal=cal
+        self.result=0
+        
+    
+    def fourcal(self):
+        if self.cal == '+':
+            self.result=self.num1+self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+    
+        if self.cal == '-':
+            self.result=self.num1-self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+            
+        if self.cal == '*':
+            self.result=self.num1*self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+
+    def div(self):
+        if self.cal == '/':
+            self.result=self.num1/self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+    
+
+class safeFourcal(Fourcal):
+        
+    def div(self):
+        if self.num2==0:
+            self.result=0
+            print("분모가 0입니다.")
+            
+        else:
+            self.result=self.num1/self.num2
+            print("{}{}{}={}".format(self.num1,self.cal,self.num2,self.result))
+
+
+#cal.py
+
+import subcal
+            
+while True:
+    menu1=input('''메뉴
+1.계산하기
+2.각 계산기의 마지막 결과 확인
+3.나가기
+
+선택하시오. : ''')
+    print("")
+    if menu1 == '3':
+        break
+    while True:
+        if menu1 =='1':
+            calnum = input('계산기를 선택하시오.(1,2,3,4,5 중에서 선택): ')
+            i=1
+            num1 = subcal.numfind(i)
+            num2 = subcal.numfind(i+1)
+            cal=input("기호 : ")
+            if calnum == '1':
+                a1=subcal.safeFourcal(num1,num2,cal)
+                if a1.cal == '/':
+                    a1.div()
+                else:
+                    a1.fourcal()
+                                    
+            if calnum == '2':
+                a2=subcal.safeFourcal(num1,num2,cal)
+                if a2.cal == '/':
+                    a2.div()
+                else:
+                    a2.fourcal()
+                
+            if calnum == '3':
+                a3=subcal.safeFourcal(num1,num2,cal)
+                if a3.cal == '/':
+                    a3.div()
+                else:
+                    a3.fourcal()
+               
+            if calnum == '4':
+                a4=safeFourcal(num1,num2,cal)
+                if a4.cal == '/':
+                    a4.div()
+                else:
+                    a4.fourcal()
+                
+            if calnum == '5':
+                a5=subcal.safeFourcal(num1,num2,cal)
+                if a5.cal == '/':
+                    a5.div()
+                else:
+                    a5.fourcal()
+
+            print("")        
+            break
+        else:
+            calnum = input('계산기를 선택하시오.(1,2,3,4,5 중에서 선택): ')
+            print("")
+            if calnum == '1':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a1.result))
+
+            if calnum == '2':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a2.result))                
+            if calnum == '3':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a3.result))               
+            if calnum == '4':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a4.result))                
+            if calnum == '5':
+                print("{}번 계산기의 마지막 값은 {} 입니다.".format(calnum,a5.result))
+            print("")    
+            break    
+
+
+
+------------------------------------------------------------------------
+doit 안에 
+
+sound / balad
+      / dance
+      / trot
+폴더를 만들고
+
+sound 폴더 안에
+
+#sound1.py
+
+def sount_print():
+	print("sound test")
+
+balad_print()
+dance_print()
+trot_print()
+
+balad 폴더 안에
+
+#balad1.py
+
+def balad_print():
+	print("balad song")
+	dance_print()
+
+dance 폴더 안에
+
+#dance1.py
+
+def dance_print():
+	print("dance song")
+
+trot 폴더 안에
+
+#trot1.py
+
+def trot_print():
+	print("trot song")
+
+실행되도록 패키지 설정을 하시오.
+
+------------------------------------
+#sound1.py
+import sys
+sys.path.append("c:\\doit")
+
+import sound.balad.balad1 as sb1
+import sound.dance.dance1 as sd1
+import sound.trot.trot1 as st1
+
+def sount_print():
+	print("sound test")
+
+sb1.balad_print()
+sd1.dance_print()
+st1.trot_print()
+
+
+
+#balad1.py
+
+from sound.dance.dance1 import dance_print
+
+def balad_print():
+	print("balad song")
+	dance_print()
+
