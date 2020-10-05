@@ -1,0 +1,103 @@
+ubuntu
+- 데비안 - ubuntu
+- init  조상프로세스
+- SYSTEMD 
+
+RHEL
+- centos , fedora
+
+6 init  , 7 systemd ,  8 systemd 관련 된 command 만 존재
+ init 관련 command 
+			init , systemd 관련 command 둘다 존재 
+					선택적 셋팅을 통해  혼란 가중
+		
+		systemd
+			- runlevel
+				init runlevel -> /etc/inittab
+				systemd runlevel -> systemctl -a  | grep multi-user			
+			- service (데몬:  runlevel o, runlevel x, standalone )
+				runlevel o
+				RHEL 6 이하  : chkconfig --list 
+								/etc/init.d/ 또는 /etc/rc.d/init.d 
+				RHEL 7 이상  : systemctl -a 
+
+======================= 참고 =========
+[root@localhost 바탕화면]# chkconfig --list sshd
+sshd           	0:해제	1:해제	2:활성	3:활성	4:활성	5:활성	6:해제
+[root@localhost 바탕화면]# ls -l /etc/rc.d/rc*.d/*sshd
+lrwxrwxrwx. 1 root root 14 2013-03-14 00:47 /etc/rc.d/rc0.d/K25sshd -> ../init.d/sshd
+lrwxrwxrwx. 1 root root 14 2013-03-14 00:47 /etc/rc.d/rc1.d/K25sshd -> ../init.d/sshd
+lrwxrwxrwx. 1 root root 14 2013-03-14 00:47 /etc/rc.d/rc2.d/S55sshd -> ../init.d/sshd
+lrwxrwxrwx. 1 root root 14 2013-03-14 00:47 /etc/rc.d/rc3.d/S55sshd -> ../init.d/sshd
+lrwxrwxrwx. 1 root root 14 2013-03-14 00:47 /etc/rc.d/rc4.d/S55sshd -> ../init.d/sshd
+lrwxrwxrwx. 1 root root 14 2013-03-14 00:47 /etc/rc.d/rc5.d/S55sshd -> ../init.d/sshd
+lrwxrwxrwx. 1 root root 14 2013-03-14 00:47 /etc/rc.d/rc6.d/K25sshd -> ../init.d/sshd
+[root@localhost 바탕화면]# head /etc/rc.d/init.d/sshd 
+#!/bin/bash
+#
+# sshd		Start up the OpenSSH server daemon
+#
+# chkconfig: 2345 55 25   <--- 이 부분이 chkconfig --list sshd 했을때 on/off 선언
+# description:    <--- 설명
+=========================================
+======================== RHEL 6 버전 이하 runlevel 의존 서비스 등록 방식==
+[root@localhost init.d]# cat aaa
+#!/bin/bash
+#
+# 
+#
+# chkconfig: 345 66 26
+# description: test
+#
+# processname: sshd
+[root@localhost init.d]# chkconfig --list aaa
+aaa 서비스는 chkconfig를 지원하지만 어떠한 런레벨에도 등록되지 않았습니다 ( 'chkconfig --add aaa'를 실행하십시오)
+[root@localhost init.d]# chkconfig --add aaa
+[root@localhost init.d]# chkconfig --list aaa
+aaa            	0:해제	1:해제	2:해제	3:활성	4:활성	5:활성	6:해제
+[root@localhost init.d]# ls -l /etc/rc.d/rc*.d/*aaa
+lrwxrwxrwx. 1 root root 13 2020-10-05 10:51 /etc/rc.d/rc0.d/K26aaa -> ../init.d/aaa
+lrwxrwxrwx. 1 root root 13 2020-10-05 10:51 /etc/rc.d/rc1.d/K26aaa -> ../init.d/aaa
+lrwxrwxrwx. 1 root root 13 2020-10-05 10:51 /etc/rc.d/rc2.d/K26aaa -> ../init.d/aaa
+lrwxrwxrwx. 1 root root 13 2020-10-05 10:51 /etc/rc.d/rc3.d/S66aaa -> ../init.d/aaa
+lrwxrwxrwx. 1 root root 13 2020-10-05 10:51 /etc/rc.d/rc4.d/S66aaa -> ../init.d/aaa
+lrwxrwxrwx. 1 root root 13 2020-10-05 10:51 /etc/rc.d/rc5.d/S66aaa -> ../init.d/aaa
+lrwxrwxrwx. 1 root root 13 2020-10-05 10:51 /etc/rc.d/rc6.d/K26aaa -> ../init.d/aaa
+[root@localhost init.d]# 
+==========================================================
+
+
+
+				
+				runlevel x (슈퍼데몬 사용 = inetd -> xinetd )
+				RHEL 6 이하  : chkconfig --list xinetd
+								/etc/xinetd.d  디렉토리를 가짐
+				RHEL 7 이상  : 기본적으로 존재 하지 않고 추천 하지 않음
+								만약존재하면 /etc/xinetd.d  디렉토리를 가짐
+				standalone
+					/etc/rc
+				rpc	 
+				
+		network
+			- network.service  vs NetworkManager
+			- netstat vs  ss  
+			- ifconfig vs ip a
+			- ifconfig vs nmcli 
+		방화벽
+			- netfilter 기반의 iptables
+			- iptables vs firewalld 
+ 
+조상프로세스   부모프로세스  자식 프로세스
+        fork() -> RUN() - intterupt -> 대기상태 - intterupt -> 종료 
+										sleep
+						
+				오류 , 에러  		
+						
+		exit() - -> swap in -> 종료 	
+		PPID --> PID  -> PPID 
+							메모리 자원 사용
+									고아프로세스  - PPID 선 종료를 통한 
+												exit() 단계 진행 오류	
+									zombie - 종료 오류로 인한 생성
+		signal -> pid 에게    kill -l 
+		

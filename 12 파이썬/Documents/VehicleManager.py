@@ -2,6 +2,8 @@
 # 차량 등록, 검색
 #
 
+#import pickle
+
 menu= '''
 A.차량등록
 B.차주검색
@@ -42,6 +44,9 @@ class CarMaker:
 '''.format(self.owner, self.color, self.kind, self.cc, self.drive, self.m_speed))
 
 car_list = {}
+#with open('test.p', 'rb') as file:
+#	car_list = pickle.load(file)
+
 while True:
 	print(menu)
 	m_choice = input("선택: ")
@@ -67,4 +72,6 @@ while True:
 		#obj = [car_owner]
 		car_list[car_owner].show()
 	else:
+		#with open('test.p', 'wb') as file:
+		#	pickle.dump(car_list, file)
 		break

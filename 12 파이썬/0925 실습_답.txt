@@ -1,0 +1,657 @@
+﻿========================================================
+
+클래스 실습
+
+메뉴
+
+A.차량등록
+B.차주검색
+
+차량등록
+
+차주 :
+색깔 : 
+차종 :(sports,suv,truck 중 택일)
+차량스펙은 자동으로 입력
+
+          sports   suv      truck  
+배기량    5000cc   3000cc   6000cc
+구동      후륜     4륜      4륜
+최고속도  300km/h  200km/h  200km/h
+
+차주검색
+
+ex)
+차주 검색 : 
+차량주인 : XXX
+차량색깔 : XX
+차종 : sports
+배기량 : 5000cc
+구동 : 후륜
+최고속도 : 500km
+
+
+class Car:
+    def __init__(self,name,color,car_value):
+        self.name=name
+        self.color=color
+        self.car_value=car_value
+
+class Sports(Car):
+    cc='5000cc'
+    action='후륜'
+    speed='300km/h'
+    
+    def car_info(self,**car):
+        return car
+    
+class Suv(Car):
+    cc='3000cc'
+    action='4륜'
+    speed='200km'
+    
+    def car_info(self,**car):
+        return car
+
+class Truck(Car):
+    cc='6000cc'
+    action='4륜'
+    speed='200km/h'
+
+    def car_info(self,**car):
+        return car
+
+car_info_list=[]
+        
+while True:
+    menu1=input("""
+차량등록
+A.차량등록
+B.차주검색
+C.나가기
+
+항목을 선택하시오. : """)
+    print("")
+    if menu1 == 'C' or menu1 == 'c':
+        break
+    while True:
+        if menu1 == 'A' or menu1 == 'a':
+            name=input("차주 : ")
+            color=input("색깔 : ")
+            
+            while True:
+                car_value=input("차종 : ")
+                if car_value == 'sports':
+                    sports=Sports(name,color,car_value)
+                    car_info_list.append(sports.car_info(차주=sports.name,색깔=sports.color,차종=sports.car_value,출력=sports.cc,구동=sports.action,최고속도=sports.speed))
+                    
+                elif car_value == 'suv':
+                    suv=Suv(name,color,car_value)
+                    car_info_list.append(suv.car_info(차주=suv.name,색깔=suv.color,차종=suv.car_value,출력=suv.cc,구동=suv.action,최고속도=suv.speed))
+                
+                elif car_value == 'truck':
+                    truck=Truck(name,color,car_value)
+                    car_info_list.append(truck.car_info(차주=truck.name,색깔=truck.color,차종=truck.car_value,출력=truck.cc,구동=truck.action,최고속도=truck.speed))
+                
+                else:
+                    print("\n다시 차종을 선택하세요\n")
+                    continue
+
+                break    
+            print(car_info_list)
+            break    
+
+        else:
+            name1=input("차주 검색 : ")
+            print("")
+            for info_dic in car_info_list:
+                if name1 in list(info_dic.values()):
+                    for i,j in info_dic.items():
+                        print("{}:{}".format(i,j))
+                    break
+                
+            break    
+
+
+============================================================================
+
+모듈 실습
+
+해당 내용의 파이썬 파일을 C:\doit1 생성 후에 저장하시오.
+
+#fourcal.py
+
+def numfind():
+	while True:
+		num=input("number : ")
+		a=0
+		for c in num:
+			if c not in "0123456789.":
+				print("숫자로 다시 입력해주세요")
+				a=a+1
+				break
+		if a==0:
+			if num.count('.') > 1:
+				print("숫자로 다시 입력해주세요")
+			elif num.count('.') ==1:
+				return float(num)
+			else:
+				return int(num)	
+
+
+def add(a,b,c):
+	return a+b+c
+
+def sub(a,b,c):
+	return a-b-c
+
+def mul(a,b,c):
+	return a*b*c
+
+def div(a,b,c):
+	return a/b/c
+
+
+print(add(1,2,3))
+print(sub(1,2,3))
+print(mul(1,2,3))
+print(div(1,2,3))
+
+1) #moduletest1.py 생성
+   fourcal 모듈의 numfind, add, mul 함수만 import 시켜서 해당 내용을 코딩하시오.
+
+계산기
+A.계산하기
+B.나가기
+
+A 실행시
+
+example)
+1번째 숫자: 11
+2번째 숫자: 22
+3번째 숫자: 33 
+기호: +
+
+11 + 22 + 33 = 66
+
+from fourcal import numfind,add,mul
+
+
+while True:
+    numlist=[]
+    choice=input('''
+계산기
+A.계산하기
+B.나가기
+
+항목 선택 : ''')    
+    if choice == 'B' or choice == 'b' or choice == 'ㅠ':
+        break
+    for i in range(0,3):
+        print("{} 번째".format(i+1),end=" ")
+        numlist.append(numfind())
+    cal=input("기호 : ")
+    print("")
+    if cal == "+":
+        result=add(numlist[0],numlist[1],numlist[2])
+        print("{}+{}+{}={}".format(numlist[0],numlist[1],numlist[2],result))
+    if cal == "*":
+        result=mul(numlist[0],numlist[1],numlist[2])
+        print("{}x{}x{}x{}".format(numlist[0],numlist[1],numlist[2],result))
+    
+
+2) #moduletest1.py를 복사해서 #moduletest2.py 생성
+   fourcal 모듈을 import 시켜서 해당 내용을 코딩하되 fourcal 모듈 실행시 나오는 출력값이 나오지 않도록 fourcal 모듈을 수정 하시오.
+
+5/2/3 의 결과값
+
+5-3-3 의 결과값
+
+#fourcal.py
+.
+.
+.
+if __name__=="__main__":
+    print(add(1,2,3))
+    print(sub(1,2,3))
+    print(mul(1,2,3))
+    print(div(1,2,3))
+
+
+#mouduletest2.py
+
+import fourcal
+
+print(fourcal.div(5,2,3))
+print(fourcal.sub(5,2,3))
+
+3) #fourcal.py를 복사해서 fourcal1.py를 만들고 그 안에 class Morefourcal을 만들어 Morefourcal 클래스 안에 자승을 연산하는 함수 생성
+   #modeultest1.py를 수정해서 자승이 연산되도록 하시오.
+
+#fourcal.py => fourcal1.py
+
+.
+.기존 내용
+.
+.
+class Morefourcal:
+
+    def __init__(self,num1,num2,num3):
+        self.num1=num1
+        self.num2=num2
+        self.num3=num3
+
+    def dublemul(self):
+        result=self.num1**self.num2
+        return result**self.num3
+
+#moduletest1.py => moduletest3.py
+
+import fourcal1
+
+while True:
+    numlist=[]
+    choice=input('''
+계산기
+A.계산하기
+B.나가기
+
+항목 선택 : ''')    
+    if choice == 'B' or choice == 'b' or choice == 'ㅠ':
+        break
+    for i in range(0,3):
+        print("{} 번째".format(i+1),end=" ")
+        numlist.append(fourcal1.numfind())
+    cal=input("기호 : ")
+    print("")
+    if cal == "+":
+        result=fourcal1.add(numlist[0],numlist[1],numlist[2])
+        print("{}+{}+{}={}".format(numlist[0],numlist[1],numlist[2],result))
+    if cal == "*":
+        result=fourcal1.mul(numlist[0],numlist[1],numlist[2])
+        print("{}x{}x{}={}".format(numlist[0],numlist[1],numlist[2],result))
+    if cal == "**":
+        a=fourcal1.Morefourcal(numlist[0],numlist[1],numlist[2])
+        result=a.dublemul()
+        print("({}**{})**{}={}".format(numlist[0],numlist[1],numlist[2],result)) 
+    
+
+------------------------------------------------------------------------
+
+C:\doit1 폴더 생성 후 폴더 안에
+
+A/AA/AAA
+
+폴더 생성
+
+A폴더 안에 
+
+#B.py
+
+a="B.py의 a변수"
+b="B.py의 b변수"
+
+
+AA폴더 안에
+
+#BB.py
+
+def bb_print(a,b):
+	print(a)
+	print(b)
+
+AAA폴더 안에
+
+#BBB.py
+
+print(bb_print(a,b))
+
+
+BBB.py 실행결과가 다음과 같이 나오도록 설정하시오.
+
+=>"B.py의 a변수"
+  "B.py의 b변수"
+
+#BBB.py
+import A.B,A.AA.BB
+
+A.AA.BB.bb_print(A.B.a,A.B.b)
+
+or
+
+import A.B as AB
+import A.AA.BB as ABB
+
+ABB.bb_print(AB.a,AB.b)
+
+
+=========================================================
+예외처리 실습
+
+1. 모든 오류에 대해서 "AllError" 을 출력하도록 하시오.
+
+try:
+	for i in "123
+		print(i)
+
+
+except:
+	print("AllError")
+
+2. 존재하지 않는 파일을 열 경우에 발생하는 오류에 대해서만 "no data" 를 출력하도록 하시오.
+
+try:
+	f=open("none.txt",'r')
+
+except FileNotFoundError:
+	print("no data")
+
+3. a={1:2,3:4} 딕셔너리에서 존재하지 않는 키값을 호출할 경우 발생하는 오류에 대해서 오류 메세지를 발생하도록 하시오.
+
+try:
+	a={1:2,3:4}
+	print(a[5])
+
+except KeyError as e:
+
+	print(e)
+
+4. "abc" 문자열을 정수로 변환할때 발생하는 오류와 3번에서 발생하는 오류에 대해서 모두 오류메세지를 발생하도록 하시오.
+
+try:
+	a={1:2,3:4}
+	print(a[5])
+	b=int("abc")
+	
+except (KeyError,ValueError) as e: 
+
+5. NameError 발생 시켰을 때 "123"을 정수로 변환시켜서 출력되도록 하시오.
+
+try:
+	print(a)
+
+finally:
+	print(int("123"))
+
+6. in 뒤에 문자열이나 리스크 형태가 아닌 것을 넣었을 때 아무런 오류도 발생하지 않도록 하시오.
+
+try:
+	for i in 123:
+		print(i)
+
+except TypeError:
+
+	pass
+
+
+7. 자식 클래스에서 부모 클래스의 메서드를 실행시킬 경우 오류가 발생되서 자식 클래스에 강제로 메서드 오버라이딩을 하도록 하시오.
+(엉터리 답안, 실제로 오류를 발생시키지 않는 코드)
+class Pa:
+	def pa(self):
+		raise NotImplementedError
+
+class Ch(Pa):
+	def pa(self):
+		print("Ch's Method")
+
+a=Ch()
+a.pa()
+
+8. Exception 클래스를 이용해서 입력을 통해서 두숫자 AA와 BB를 입력받고 나누었을 때 나머지가 0가 되면 "AA 와 BB의 나머지는 0 입니다."가 출력되도록 하시오.
+
+class Error0(Exception):
+    pass
+   
+def cal(num1,num2):
+    if num1%num2 == 0:
+        raise Error0()
+    else:
+        print("{}%{}={}".format(num1,num2,num1%num2))
+        
+try:
+    num1=int(input("첫번째 숫자 : " ))
+    num2=int(input("두번째 숫자 : "))
+    cal(num1,num2)
+  
+except Error0:
+    print("{} 와 {}의 나머지 값은 {}이다.".format(num1,num2,num1%num2))
+
+9.변수값으로 'A'를 입력할 경우 오류가 발생되서 "'A'를 입력하지마시오." 오류 메세지가 발생하도록 하시오.
+
+class MyError(Exception):
+
+	def __str__(self):
+		return "'A'를 입력하지 마시오."
+
+try:
+	string=input("string을 입력하시오. : ")
+	if 'A' in string:
+		raise MyError()
+	else:
+		print(string)
+
+except MyError as e:
+	print(e)
+
+
+10. input() 통해서 숫자를 입력받을 경우 try:...except: 를 통해 숫자를 입력 받아야 통과하도록 해보시오.
+
+i=0
+while i==0:
+    try:
+        a=int(input("숫자를 입력하시오 : "))
+        i=1
+    except:
+        print("다시 입력하시오.\n")
+        
+        
+print(a)
+
+
+========================================================
+내장함수 실습
+
+list1=[7,3,5,2,0,6,1,4]  
+
+1. filter 함수를 통해 list1의 각 요소를 2로 나누었을 때 나머지의 값이 1이 되는 것만 출력하시오.
+
+print(list(filter(lambda x:x%2==1,list1)))
+
+2. map 함수를 이용해서 list1의 요소들을 모두 문자열로 만들어서 list2를 만드시오.
+
+list2=list(map(lamdba x:str(x),list1))
+print(list2)
+
+3. list2에 대해서 정열하시오.
+
+list2.sort()
+
+or
+
+lista=sorted(list2)
+
+4. enumerate 함수를 이용해서 list2의 각 요소들에 대한 아스키코드 값으로 list3을 만드시오.
+
+list3=list2[:]
+
+for i,j in enumerate(list3):
+	list3[i]=ord(j)
+
+print(list3)
+	
+
+5. list3의 각 요소들의 총 합과 평균을 구하시오.
+
+a=sum(list3)
+b=sum(list3)/len(list3)
+
+6. list3 의 최대값과 최소값을 구하고 최대값/최소값을 했을 때 나눈 몫과 나머지를 구해보시오.
+
+c=max(list3)
+d=min(list3)
+
+divmod(c,d)
+
+7. list2와 list3를 사용해서 {문자:아스키코드} 형태의 딕셔너리를 만들고 test.txt에 문자열 형태로 저장 후에 출력 되도록 하시오.
+
+f=open("test.txt",'w')
+
+dic={}
+i=0
+while i<len(list2):
+	dic[list2[i]]=list3[i]
+	i=i+1
+
+data=str(dic)
+f.write(data)
+f.close()
+
+f=open("test.txt",'r')
+dic=eval(f.readline())
+print(dic)
+f.close()
+
+8.문자열의 함수가 어떤 것이 있는지 알아보시오.
+
+dir(str)
+
+9. input을 통해 실수를 입력 받아서 소숫점 3자리이후 부터는 반올림 되도록 하시오. 단 숫자형으로 입력했을 경우에만 입력되고 숫자형이 아닐때는 재 입력 창이 뜨도록 하시오.
+
+i=0
+while i==0:
+
+	try:
+		floatnum=float(input("실수를 입력하시오. : "))
+		i=i+1
+	except:
+		print("다시 입력하시오")
+		continue
+
+print(round(floatnum,3))
+
+외장함수 실습
+
+1. cmd 창에서 python을 바로 실행시키고 c:\doit 폴더로 이동해보시오.
+
+import os
+os.chdir("c:/doit")
+
+2. 현재 위치해 있는 폴더를 출력하시오.
+
+os.getcwd()
+
+3. 현재 위치에 test1 폴더를 생성하시오.
+
+os.mkdir("test1")
+
+4. test1폴더 안에 srp.txt를 생성하고 ['가위','바위','보']를 저장하시오.
+
+import pickle
+
+f=open("c:/doit/test1/srp.txt",'wb')
+
+pickle.dump(['가위','바위','보'],f)
+
+f.close()
+
+5. test1폴더 안에 srpuser.txt를 생성하고 input를 통해서 '가위','바위,'보' 중 하나를 10번 입력하고 저장되도록 하시오.
+
+srpusers=[]
+
+for i in range(10):
+	srpusers.append(input("가위,바위,보 : "))
+
+f=open("c:/doit/test1/srpuser.txt",'wb')
+
+pickle.dump(srpusers,f)
+
+f.close()
+
+
+6. srp.txt와 srpuser.txt 를 이용해서 본인이 입력한 가위바위보의 승패를 가려보시오.(hint:random함수)
+
+
+f1=open("c:\\doit\\test1\\srp.txt",'rb')
+
+srplist1=pickle.load(f1)
+
+f1.close()
+
+f1=open("c:\\doit\\test1\\srpuser.txt",'rb')
+
+srplistuser=pickle.load(f1)
+
+f1.close()
+
+print(srplist1)
+
+srplistrandom=[]
+
+print(srplistrandom)
+
+i=0
+w=0
+l=0
+d=0
+srp_win={'가위':'바위','바위':'보','보':'가위'}
+
+while i<10:
+	srprandom=random.choice(srplist1)
+    
+	srplistrandom.append(srprandom)
+    
+	i=i+1
+
+print(srplistrandom)
+
+print(list(zip(srplistuser,srplistrandom)))
+    
+for a,b in zip(srplistuser,srplistrandom):
+	if a not in ['가위','바위','보']:
+		print("짐")
+		l=l+1
+	elif a == b:
+		print("비김")
+		d=d+1
+	elif a == srp_win[b]:
+		print("이김")
+		w=w+1
+	else:
+		print("짐")
+		l=l+1
+
+print("{} 승 {} 패 {} 비김".format(w,l,d))
+
+7. random 함수를 통해서 ('가위','바위','보')를 랜덤하게 10번 출력되게 하시오.(hint:random함수)
+
+import random
+
+srplist1=['가위','바위','보']
+i=1
+
+while i<=10:
+    srp=srplist1[random.randint(0,2)]
+    print(srp)
+    i=i+1
+
+or
+
+import random
+
+srplist1=['가위','바위','보']
+i=1
+
+while i<=10:
+    srp=random.choice(srplist1)
+    print(srp)
+    i=i+1
+
+or
+
+import random
+
+i=1
+while i<=10:
+	srplist1.shuffle()
+	print(srplist1[0])
+	i=i+1
