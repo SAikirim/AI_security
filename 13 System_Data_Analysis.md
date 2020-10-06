@@ -664,3 +664,40 @@ Accepted password for  존재하면서 로그인을 성공한 계정
 
 	- :0  시스템 운영체제가 운영체제를 동작시키기 위해 사용 
 
+---
+## WEB ATTACK과 log
+* sql injection
+* xss
+* csrf
+* file upload attack -> web shell
+* file download
+* 파라미터 변조
+* 불층분한 인증, 인가, 직접객체 참조
+
+* 찾기 힘든 공격
+	- file download
+	- 파라미터 변조
+	- 잘못된 인증, 인가
+	
+	- sql injection, xss
+		+ 기존 정보에 + 외부 유입이 들어가는 구조
+		+ 외부 유입이 들어가는 부분에 대한 문자열 필터링 혹은 decode 방식을 이용하여 입력되는 값을 해석할 수 있음
+		
+---
+### 문제 1
+어떤 사용자가 몇 번 접속했는지
+cat lastb.txt |  awk '{print $1}' | sort -n | uniq -c  |tail -n+3
+
+### 문제 2
+어떤 아이피 주소가 있고 각각 몇번 접속
+awk '{print $2 " : " $3}' lastb.txt | sort -n | uniq -c |tail -n+4 |grep -v "localhost"
+
+### 문제3
+각 아이피별로
+get, post 요청
+
+### jc사용한 json변환 명령어
+head -n10 access.log|sed 's/"//g'|tail -n+2 |awk '{printf "%s, %s, %s\n",$1, $6, $7 }' |sed -e '1 i\"IP", "METHOD", "URL"' | jc --csv -p
+
+### awk 사용
+sed 's/\"//g' access.log | grep ^[0-9]| awk '{print "\""NR"\":{\"IP\":\""$1 "\", \"METHOD\":\""$6"\"},"}'
