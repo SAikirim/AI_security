@@ -1,0 +1,5 @@
+Jupyter 기본 사용법.ipynb
+numpy 기존 사용법.ipynb
+day2-1.ipynb
+pandas 사용법.ipynb
+day2-3.ipynb
