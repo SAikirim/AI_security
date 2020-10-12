@@ -350,7 +350,7 @@ df = pd.DataFrame([[15, '남', '덕영중'], [17, '여', '수리중']],
 
 * 열 이름 변경
 `df.columns=['연령', '남녀', '소속']`
-`df.rename(columns={'나이'='연령', '성별':'남녀', '학교':'소속'}, inplace=True)`
+`df.rename(columns={'나이':'연령', '성별':'남녀', '학교':'소속'}, inplace=True)`
 
 * 행/열 삭제
 ```
@@ -649,7 +649,12 @@ df_3.index=['south','north']
 df_3.columns = df_3.columns.map(int)		# header의 자료형을 int로 바꿈
 df_3.T.plot()								# 기본값: 'line'
 ```
+* 막대 그래프
+	- `df_2.T.plot(kind='bar')`
+	- 규모와 변화 추이를 한 눈에 알기 쉬움(선 그래프와 비슷)
 
+* 히스토그램
+	- `df_2.T.plot(kind='hist')`
 
 * 산점도 : 상관계수를 시각적으로 확인 가능
 ```
@@ -669,3 +674,147 @@ df.plot(kind='scatter', x='mpg', y='weight')
 	df[['mpg', 'cylinders']].plot(kind='box')
 	```
 
+---
+# Part4 시각화 도구
+참고 : pp108 - 169
+
+* 막대 그래프
+	- 세로형 : 시간적으로 차이가 나는 두 점에서  데이터 값의 차이를 잘 설명함
+	- 가로형 : 각 변수 사이 값의 크기 차이를 설명하는 데 적합함
+
+* 보조 축 활용하기(2축 그래프 그리기)
+	- 참고 : p135
+	```
+	...
+	# 증감율(변동률) 계산
+	df = df.rename(columns={'합계':'총발전량'})
+	df['총발전량 - 1년'] = df['총발전량'].shift(1)
+	df['증감율'] = ((df['총발전량'] / df['총발전량 - 1년']) - 1) * 100
+	
+	# 2축 그래프 그리기
+	ax1 = df[['수력','화력']].plot(kind='bar', figsize=(20, 10), width=0.7, stacked=True)  
+	ax2 = ax1.twinx()
+	ax2.plot(df.index, df.증감율, ls='--', marker='o', markersize=20, 
+			 color='green', label='전년대비 증감율(%)')
+	...
+	```
+* 히스토그램
+	- 변수가 하나인 단변수 데이터릐 빈도수를 그래프로 표현
+	- 구간을 나눌수 있는 장점이 있음
+	- `kind='hist'`
+	
+---
+# Part5 데이터 사전 처리
+* 데이터의 전처리
+	- 누락되는 데이터 NaN
+		+ Not a Number
+		
+* `import seaborn as sns`
+* `df = sns.load_dataset('titanic')`
+
+* 누락 데이터 확인
+```
+* isnull()
+	- 누락 데이터면 True를 반환, 유효한 데이터가 존재하면 False를 반환
+* notnull()
+	- isnull()의 반대
+```
+
+* 누락 데이터 개수 확인
+`df.isnull().sum(axis=0)`
+
+* 누락 데이터 제거
+	- null값이 600개 이상이면 지움
+	- `df_2 = df.dropna(axis=1, thresh=600)`
+	- age열의 누락 데이터 삭제
+	- `df.dropna(subset=['age'], how='any', axis=0)`
+
+### 누락 데이터 치환
+* 평균값으로 치환
+```
+mean_age = df_2['age'].mean(axis=0)
+df_2['age'].fillna(mean_age, inplace=True)
+```
+	- 중간값 : meadian() 사용
+
+* 많이 사용한 값으로 치환
+```
+most_emb = df['embark_town'].value_counts(dropna=True).idxmax()
+df['embark_town'].fillna(most_emb, inplace=True)
+```
+	- 누락 데이터의 갯수까지 확인 : dropna=False 옵션 사용
+* 유사성을 갖는 데이터
+	- fillna(method='ffill') : NaN이 있는 직전행에 있는 값으로 치환
+	- fillna(method='bfill') : NaN이 있는 다음행에 있는 값으로 치환
+```
+df['embark_town'].fillna(method='ffill', inplace=True)
+df['embark_town'][825:831]
+```
+
+#### 누락 데이터가 NaN으로 표시되지 않은 경우
+* import numpy as np
+* df.replace('?', np.nan, inplace=True)
+	- '?'를 np.nan으로 치환
+
+## 중복 데이터 처리
+* 중복여부를 확인 : duplicated()
+* `df.duplicated()`
+	- `df['c2'].duplicated()`
+	- 전에 나온 행들과 비교하여 중복되는 행이면 'True'를 반환
+	- 처음 나오는 행에 대해서는 'False'를 반환
+* `df.drop_duplicates()`
+	- 중복 데이터 제거
+	- `df.drop_duplicates(subset=['c2','c3'])`
+		+ 'c2','c3'열을 기준으로 판별
+
+## 데이터 표준화
+* 단위 환산 (예: 인치 -> 미터)
+    - 직접 수식 입력
+	- 직접 계산함
+* 자료형 변환
+	- 타입 확인 : df.dtypes
+    - df[""].astype()
+	- `df['horsepower'] = df["horsepower"].astype('float')`
+	- 문자열을 범주형으로 변환 : `df['origin'] = df['origin'].astype('category')`
+	- 범주형을 문자형으로 변환 : `df['origin'] = df['origin'].astype('str')`
+
+* 범주형(카테고리) 데이터 처리
+	- 구간 분할(binning) : 연속 변수를 일정한 구간으로 나누고, 각 구간을 범주형 이산 변수로 변환하는 것
+	```
+	import numpy as np
+	...
+	# np.histogram 함수로 3개의 bin으로 나누는 경계 값의 리스트 구하기
+	count, bin_dividers = np.histogram(df['horsepower'], bins=3)	
+
+	# 3개의 bin에 이름 지정
+	bin_names = ['저출력', '보통출력', '고출력']
+
+	# pd.cut 함수로 각 데이터를 3개의 bin에 할당
+	df['hp_bin'] = pd.cut(x=df['horsepower'],     # 데이터 배열
+						  bins=bin_dividers,      # 경계 값 리스트
+						  labels=bin_names,       # bin 이름
+						  include_lowest=True)    # 첫 경계값 포함 
+	```
+	
+	- 더미 변수(dummy variable) : 범주형 데이터를 0 또는 1로 표형함
+		+ 0과 1은 어떤 특성이 있고 없고만 나타냄
+	- `horsepower_dummies = pd.get_dummies(df['hp_bin'])`
+	- 윈핫인코딩 참고 : p196
+	
+	
+* 정규화
+	- 숫자 데이터의 상대적인 크기 차이를 제거할 때 사용
+    - (x - x_min) / (x_max - x_min)
+	```
+	min_x = df.horsepower - df.horsepower.min()
+	min_max = df.horsepower.max() - df.horsepower.min()
+	df.horsepower = min_x / min_max
+	```
+* 표준화
+    - x - x_mean / std(x) ~ (0,1)
+
+## 시계열 데이터
+* 참고 : pp201 - 215
+
+
+### 단위환산
