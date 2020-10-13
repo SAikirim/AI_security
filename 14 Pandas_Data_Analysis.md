@@ -701,8 +701,39 @@ df.plot(kind='scatter', x='mpg', y='weight')
 * 히스토그램
 	- 변수가 하나인 단변수 데이터릐 빈도수를 그래프로 표현
 	- 구간을 나눌수 있는 장점이 있음
-	- `kind='hist'`
-	
+	- `df.['mpg'].plot(kind='hist', bins=10, color='coral', figsize=(10,5))`
+
+* 산점도
+	- 서로 다른 두 변수 사이의 관계를 나타냄
+
+* 파이 차트
+	- 원을 파이 조각처럼 나누어서 표현함
+	- 조각의 크기는 해당 변수에 속하는 데이터 값의 크기에 비례함
+
+* 박스 플롯
+	- 범주형 데이터의 분포를 파악하는데 적합
+	```
+	# 그래프 객체 생성 (figure에 2개의 서브 플롯을 생성)
+	fig = plt.figure(figsize=(15, 5))   
+	ax1 = fig.add_subplot(1, 2, 1)
+	ax2 = fig.add_subplot(1, 2, 2)
+
+	# axe 객체에 boxplot 메서드로 그래프 출력
+	ax1.boxplot(x=[df[df['origin']==1]['mpg'],
+				   df[df['origin']==2]['mpg'],
+				   df[df['origin']==3]['mpg']], 
+			 labels=['USA', 'EU', 'JAPAN'])
+
+	ax2.boxplot(x=[df[df['origin']==1]['mpg'],
+				   df[df['origin']==2]['mpg'],
+				   df[df['origin']==3]['mpg']], 
+			 labels=['USA', 'EU', 'JAPAN'],
+			 vert=False)
+	```
+
+## Seaborn 라이브러리 - 고급 그래프 도구
+* 참고 : pp147 - 169
+
 ---
 # Part5 데이터 사전 처리
 * 데이터의 전처리
@@ -816,5 +847,3 @@ df['embark_town'][825:831]
 ## 시계열 데이터
 * 참고 : pp201 - 215
 
-
-### 단위환산
