@@ -1,4 +1,5 @@
 # 15 Hands-On ML(Scikit-Learn, Keras, TensorFlow)
+* 참고 ; 핸즈온 머신러닝_*장.ipynb
 
 ## 머신러닝을 왜 쓰는가?
 * 전통적인 프로그래밍?
@@ -108,11 +109,15 @@
     - 해결방안은???
         + 규제를 사용(참고: p59)
 		+ 하이퍼피라미터(규제하기 위해사용하는 값)를 사용 
-* 과소 적합 발생
+* 과소 적합
     - 모델이 너무 학습이 안 되어있다.
     - 특징을 못 찾음
     - Ex) 주가 예측 -> 1/2 확률
         + 사람 40%, 침팬치 60%
+	- 해결 방법
+        + 더 강력한 모델을 선택
+        + 훈련 알고리즘에 더 좋은 특성을 주입
+        + 모델의 규제를 감소	
 		
 ## 학습이 잘되는 기준?
 * lost function OR loss function
@@ -174,3 +179,181 @@ Ex) 소득
 
 3. 가정 검사
 	- '분류'가 아니라 '회귀'를 사용하는게 맞는지 다시 확인
+	
+## 파이프 라인 생성 & 머신러닝 알고리즘을 위한 데이터 준비
+* 데이터 전처리 : 주어진 데이터 변환
+    - 왜? : 효율성을 위해
+* 수치형 데이터 전처리
+    - 데이터 정제 : 필요없는것 빼기
+    - 조합 특성 추가
+    - 특성 스케일링
+        - 표준화(표준편차)
+        - 정규화(min-max) : 최소, 최대를 0~1로 바꿈
+* 범주형 데이터
+    - 원-핫 인코딩 -> 확률
+    - 숫자 True -> 1, False -> 0
+        + 데이터 -> 1 or 0 -> 딥러닝 : 0.8 확률로 계산되어 나옴(예: 0.8퍼센트로 True이다)
+        + 숫자 2 -> [0,0,1,0,0,0,0,0,0,0]
+		
+## Sklearn API 활용
+* API를 이용하면 데이터 전처리에 관한 과정을 간편하게 구성할 수 있음
+* API : 일관되게 설계해야 한다. -> 클래스 남용 금지(numpy array로 통일)
+* API 종류
+    - 추정기
+        + 모델의 파라미터 추정, fit()를 사용
+    - 변환기
+        + 데이터셋 변환, transform()을 사용
+            * 보통 fit(), transform() 동시에 사용
+    - 예측기
+        + 데이터 예측, predict()을 사용
+            * fit(), predict()
+			
+## 모델 선택과 훈련
+
+### 모델 선택
+* 평균제곱근 오차(RMSE)
+* MSE
+* DecisionTreeRegressor
+* RandomForestRegressor : 가장 좋음
+* SVM(support vector machine, 서포트 벡터 머신) : 경계로 나눔
+======================= 학습 완료
+
+### 교차 검증
+* k-겹 교차 검증
+* 훈련세트를 '폴드'라 불리는 10개의 서브셋로 무작위로 분할
+    - 10개를 각각 훈련시켜보고, 좋은 것을 선택
+	- 9개는 폴드는 훈련에 사용, 1개는 평가(검증)에 사용
+* 모델이 일관되게 동작하는지 확인 가능
+    - 좋은 모델일수록 -> 표준편차가 작음(일관되게 학습됨)
+	
+## 모델 튜닝
+* RandomForestRegressor 가장 성능이 좋다.
+* 성능이 좋은 모델을 호출 후 튜닝한다.
+    - 그리드 탐색
+        + 수동으로 하이퍼 파라미터 조합을 찾는다.
+        + 리스트로 하이퍼 파라미터를 지정 후 넣어준다.
+    - 랜덤 탐색
+        + 랜덤으로 조합을 찾아준다.(자동)
+        + 하이퍼파라미터의 값의 횟수를 지정해주고 횟수만큼 반복한다. (low값과, high값을 결정해주고 횟수를 결정)
+		+ `from sklearn.model_selection import RandomizedSearchCV`
+    - 앙상블
+        + 한개의 모델을 사용하는 것보다. 좋은 성능을 보이는 여러개의 모델을 조합하여 더 좋은 성능을 나타나게 만든다.
+		
+### 최상의 모델과 오차 분석
+참고 : p118
+
+### 테스트 세트로 시스템 평가하기
+참고 : pp119-120
+
+---
+# CHAPTER 3 분류
+
+## MNIST
+* 미국조사국 직원들이 손으로 쓴 70,000개의 작은 숫자 이미지
+
+## 이진 분류기
+* 맞냐 틀리냐? 두개로 나눈다.
+    - 이진분류를 반복하면 다중분류가 가능해 진다.
+
+* 모델을 선태하여 훈련시킨다.
+    - '__확률적 경사하강법__'을 통해 아래 3가지로 변함
+        + 퍼셉트론
+        + LogisticRegression : 분류 모델
+        + SVM(support vector machine, 서포트 벡터 머신) : 경계로 나눔
+* 확률적 경사하강법
+    - 학습데이터의 단위를 배치라 하고, 배치 사이즈가 1인 분류기
+    - 한번에 하나씩 훈련샘플을 처리해서 학습
+
+```
+from sklearn.linear_model import SGDClassifier
+
+SGDClassifier(loss='perceptron')
+SGDClassifier(loss='log')
+SGDClassifier(loss='hinge')  # 기본값 SVM
+```
+* SGD : Stochastic(확률적) Gradient(기울기) Descent(하강)
+
+# Set
+* Test(수능) vs Training(사설모의고사) vs Validation(평가원 모의고사)
+    - 모델을 검증하는 과정에서 Test Set을 사용한다. Test Set = Validation
+    - 문제점
+        + Test Set을 이용해 모델의 성능을 확인하고 -> 파라미터 수정 -> Test에서만 잘 동작하는 모델이 생성된다.
+        + Trainnig -> Validation 보정 -> Test으로 평가
+        + Test(1) : Training(8) : Validation(1)
+  
+* Validation Set을 사용했을 때 장점
+    - 과적합 문제를 해결할 수 있다.
+
+* 검증세트를 통해 모델 선정 과정
+    1. Trainig Set으로 Model 학습
+    2. 학습괸 모델을 Validation Set으로 평가
+    3. Validation Set에 대한 결과로 모델 파라미터 조작
+    4. 가장 우수한 모델 선택
+    5. 그 모델로 Test Set 평가
+	
+### 교차 검즘
+* 단순교차 검증
+    - 예) k=3인 경우
+    - trainig 데이터를 3구간으로 나누고, 3구간으로 또 나눔(9개 구간)
+    - 그리고 3구간은 Validation Set으로 사용하고, 6구간은 training
+    ```
+    from sklearn.model_selection import cross_val_score
+    cross_val_score(모델객체, 훈련데이터, 타겟, cv=폴드수)
+    ```
+* 계층별 K-겹 교차검증
+    - 편향된 데이터의 경우 단순교차 검즘으로는 문제가 발생할 수 있다.
+    - 계층을 나누고 분할해서 뽑는다.(자동)
+    ```
+    from sklearn.model_selection import StratifiedKFold
+    skf = StratifiedKFold(n_splits=3, random_state=42, shuffle=True)
+    cross_val_score(sgd_clf, X_train, y_train_5, cv=skf)
+    ```   
+* 임의분할 교차검증
+    - Train_size와 test_size를 데이터 개수(정수) 또는 비율(실수)로 정할 수 있다.
+    - 4번 반복 분할 25%가 검증세트가 된다.
+    - 10%를 검증세트로 4번 반복분할하여 학습시킬 수 있다.
+    ```
+    from sklearn.model_selection import ShuffleSplit
+    ss = ShuffleSplit(n_splits=8, random_state=42, test_size=0.5, train_size=0.5)
+    cross_val_score(sgd_clf, X_train, y_train_5, cv=ss)
+    ```
+* 나오는 값은 '정확도'를 의미   
+ 
+## 오차 행렬(Confusion Matrix)
+```
+from sklearn.metrics import confusion_matrix
+```
+* 행 : 실제 Class(target)
+* 열 : 예측 Class(predict)
+* TP(True Positive), FP(False Positive), FN(False Negative), TN(True Negative)
+
+* 정밀도(Precision)
+    - 모델이 True라고 예측한 것 중에서 실제 True인 것에 대한 비율
+    - TP(True Positive) / TP + FP(False Positive)
+    - 예) 맑다고 예측했는데 실제 맑은날 비율
+
+* 재현율(Recall)
+    - 실제 T 모델이 T라고 예측하것의 비율
+    - TP / TP + FN(False Negative)
+    - 예) 실제 맑은날 중에 맑다고 예측한 비율
+    
+* 두 얼굴 중 한 사람 얼굴 찾음
+    - Precision: 100%
+    - Recall: 50%
+    
+* 정밀도 VS 재현율
+    - 실제 Positive인 데이터를 Negative로 잘못 판단하면 안되는 경우 '__재현율__'을 사용
+        - 인증, 악성코드, 병진단
+        - 실제로 양성인데 음성으로 판단하면 -> 병을 키울수 있다.
+    - 실제로 Negative인데 Positive로 잘못 판단하면 안되는 경우 '__정밀도__'를 사용
+        - 스팸메일
+        - 스팸메일이 아닌데 스펨메일로 판단하면 -> 중요 메일을 못받음
+        
+* 정밀도는 낮아지고 재현율이 높아진다 -> 예측을 많이 함(골결이 낮다. 호난사)
+* 정밀도가 높아지고 재현율이 낮다 -> 신중하게 예측을 함. (찬스는 낮지만, 골결이 높다. 손날두)
+
+* confidence Threshold 값에 따라 정밀도와 재현율의 수치가 조정되고(서로 상보적), trad-off가 발생한다.
+    - trad-off : 한쪽이 올라가면 다른쪽이 내려가는 모순적 관계를 이르는 말
+
+
+질문 : p108, '변환 파이프라인' 무슨 내용?
