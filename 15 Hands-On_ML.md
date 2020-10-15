@@ -355,5 +355,188 @@ from sklearn.metrics import confusion_matrix
 * confidence Threshold 값에 따라 정밀도와 재현율의 수치가 조정되고(서로 상보적), trad-off가 발생한다.
     - trad-off : 한쪽이 올라가면 다른쪽이 내려가는 모순적 관계를 이르는 말
 
+## 다중 분류
+* OvR/OvA
+    - 0 vs all/{0}
+    - 1 vs all/{1}
+    - 2 vs all/{2}
+* OvO
+    - 각 Class마다 2진 분류실행 N(N-1)/2 = n_C_2
+    - combination 연산을 함
+    - 5 vs 0
+    - 5 vs 1
+    - 5 vs 2
+    - ...
+    
+* 보통은 OvR을 선호
+    - 훈련셋이 많으면 OvR
 
-질문 : p108, '변환 파이프라인' 무슨 내용?
+---
+# CHAPTER 4 모델 훈련
+* Data -> 변수 1개, x -> y
+* 연속형 데이터
+    - 값을 예측
+
+* 분류형(범주) 데이터
+    - class를 분류
+
+## 선형회귀 모델
+* 선에서 벗어난 오차를 '입십론($\epsilon$)'이라 부름
+    - f(Xn) + 입실론 = Yn
+    - 에측            실제값
+* 각각의 '입실론'을 최소화시키는게 선형 회귀 모델임
+    - $ f(X) = \beta0 + \beta1X + \epsilon(범위) $
+        + predict=$\beta0+\beta1X$
+    - 오차 : 우리가 인정할 수 있어야 한다.
+        + \epsilon_i$의 분포가 정규분포 안쪽 -> 인정 가능
+    - 정규 분포는 : E(입실론i) = 0
+    
+### Cost function
+* $\displaystyle \sum_{i=1}^n (Y_i-\widehat{Y_i})^2$
+* Cost function이 최소화 되는 값을 찾는게 목표!
+* root 금지 - 미분이 어렵게 됨
+* 거리의 방향을 제거한
+* 예)
+    - 범위 : 1 ~ 6
+    - predict function : 2
+    - cost : (1-2)^2 + (6-1)^2 = 17
+    - predict function : 3
+    - cost : (1-3)^2 + (6-3)^2 = 13
+    - predict function : 4
+    - cost : (1-4)^2 + (6-4)^2 = 13
+    - 그래프는 곡선($\cup$)일 것이다.
+        + 그래프의 최하단이 cost값을 최소화 한다.
+        
+* $f(\beta_{0},\beta_{1})$
+    + 변수 $\beta_{0}, \beta_{1}$
+
+* $\beta$가 2개면 그래프가 입체적으로 변함 곡선뿔(아래로 볼록?)같은 형태
+
+### 미분
+* 기울기 0을 찾을 때 사용 가능
+    - __기울기가 0이 cost값이 최소__
+    
+* $\beta$가 1개
+    - 그냥 '미분'함
+    - $\beta_0$에 대해 미분
+
+* $\beta$가 2개
+    - 다변량 '미분'함
+    - $\beta_{0}, ..., \beta_{1}$에 대해 미분
+
+#### 미분
+* __접하는 선(line)의 기울기__
+    - 순간 속력(순간 변화량)
+* 이동거리 : 2km -> 3시간
+* 평균속력 : 2/3 -> km/시간
+    - 평균속력 : 거리의 변화량 / 시간의 변화량 = __기울기__
+
+$\displaystyle \lim_{\vartriangle t \to 0}  {f(t) - f(t+\vartriangle t) \over \vartriangle{t}}$ : 순간 속력
+
+* __기울기 = 0 => 미분 = 0__
+
+## Cost function의 미분
+### 1) $\beta$가 1개
+* $cost'(\beta_{0})$, ${d \over d\beta_{0}} cost(\beta_{0})$
+* ${d \over d\beta_{0}} cost(\beta_{0})$ = $0 -2Y_i +2\beta_0$
+    - $\beta_0$ = $\sum Y_i$
+    
+### 2) $\beta$가 2개 (편미분, 다변수 미분)
+* 이미지 참조 : 1.pdf
+
+* $\partial$(파셜)
+    - $\partial cost(\beta_{0},\beta_{1}) \over \partial \beta_{0} = 0$
+    - $\partial cost(\beta_{0},\beta_{1}) \over \partial \beta_{1} = 0$
+    
+* 변수 2개 식 2개 => 연립 방정식
+    - 이미지 참조 : 1.pdf
+    
+* 변수 3개, 미분 3번, $\beta_0, \beta_1, \beta_2$ => 연립방정식
+    - $\beta_0 + \beta_1 X_1 + \beta_2 X_2$
+    
+### 다변량 '미분'이 '일반화'되면?
+* __정규방정식__이 나타난다.
+* 정규방정식의 표기법?
+    - 이미지 참조
+
+### cost function
+* 정규방적식 사용은 컴퓨터에게 부담이 된다.
+    - => $ \sum_{i=1}^n (XB-y)^2$ '미분'하면 => 0
+    - $0 - 2X^T(XB-y)$
+    - ...
+    - $B = (X^TX)^{-1} X^Ty$ : 정규 방정식
+
+## 경사 하강법
+* 선형회귀 풀이 2번째
+* Cost functinon => cost($\beta$)
+    - 목적 : $cost'(\beta) = 0 인 \beta을 찾는것$
+    - 방법 1 : $\beta \in R^n$에 대해 무차별 대입
+    - 방법 2 : 적당한 규칙을 적용 => 순차적으로 업데이트 => 결과
+        + 적당한 규칙 : 이미지 참조(1.pdf)
+        + 기울기가 0이 될 때까지 반복 => B = B - n*0 = B
+        
+* 정규방적식 풀이는 컴퓨터에게 엄청난 부담을 준다.
+* 에타($\eta$) : 학습률(Learning rate), 사용자가 정하는 값, 하이퍼파라미터
+* 베타($\beta$) : 구할려는값(기울기, 절편)
+
+## 배치 경사 하강법의 종류
+* BATCH(배치) 사이즈를 기준으로 종류를 나눔
+1. 많은 피처(Feature, 특성)를 몽땅 학습시키면
+    - 문제 : 오래거림, 메모리 부족
+2. 데이터를 나눠서 여러번의 학습 과정
+
+1. epoch, step, batch size
+    - epoch : 전체 샘플(Sample) 한 바퀴 돌면, 1 epoch
+    - step : 기울기(가중치, Weight),  편향(절편, Bias) 1회 업데이트, 1 setp
+    - batch size : 1 step에서 사용한 데이터의 수
+        + 몇 개를 학습 시킬지 정함
+
+**식 4-6: 비용 함수의 그레이디언트 벡터**
+
+$
+\dfrac{\partial}{\partial \boldsymbol{\theta}} \text{MSE}(\boldsymbol{\theta})
+ = \dfrac{2}{m} \mathbf{X}^T (\mathbf{X} \boldsymbol{\theta} - \mathbf{y})
+$
+
+**식 4-7: 경사 하강법의 스텝**
+
+$
+\boldsymbol{\theta}^{(\text{next step})} = \boldsymbol{\theta} - \eta \dfrac{\partial}{\partial \boldsymbol{\theta}} \text{MSE}(\boldsymbol{\theta})
+$
+
+## GD(Gradient descent,경사 하강법)
+* Full Batch GD
+* Batch size = m = 전체 데이터
+* matrix 연산
+    - m번 계산후 업데이트
+
+## SGD(Stochastic Gradient Descent, 확률적 경사 하강법)
+* batch size = m = 1 (랜덤으로 추출된 1개의 데이터를 사용하여 업데이트)
+* 벡터단위 연산
+    - 장점 : 업데이트가 빠르다. (1번 계산으로 업데이트)
+    - 단점 : 행렬 연산의 장점이 사라진다.
+    
+## Mini Batch GD
+* batch size = m = 사용자가 지정 $2^n$로 지정
+    - 장점 : matrix 연산 사용
+    - 단점 : SGD보다 느리다.
+
+
+
+## Cost function
+* 입력한 Training Set에 대하여 가장 적합한 직선을 우리가 가질 수 있게 해줌 = 목표
+* Cost = (h - y)^2
+    - Cost = 예측된 결과 값(h) - 실제 결과 값(y)
+    - 음수로 값이 없어지면 안되기 때문에 제곱함
+
+# 개인 정리
+1. 선형 회귀에서 미분을 사용하는 이유?
+  - __Cost function__의 최소값을 구하기 위해서
+  - 미분을 사용하면 기울기 0을 구할 수 있어서, 기울기 0이 최소값
+2. 미분이 순간속력을 구하는 거고, 미분은 방향(-/+)을 가지고 있는게 맞나요?
+  - 미분 : 순간적인 변화
+  - yes
+3. 구하는 $\beta$는 '기울기'와 '절편'을 뜻하는가?
+  - yes
+4. cost function이 MSE와 같다고 할수 있나요?
+  - MSE 는 Cost Function의 한 종류 입니다
