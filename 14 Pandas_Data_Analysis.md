@@ -260,7 +260,7 @@ array([[11, 12, 13],
 
 		+ eig : 고유값 고유벡터 계산
 		+ qr : qr분해 계산
-		+ svd : 특이값 분해 계산
+		+ svd(Singular Value Decomposition) : 특이값 분해 계산
 		+ slove : 연립방정식 해 계산
 		+ matrix_rank : 행렬의 rank를 반환한다.
 * np.linalg.matrix_rank(w) # 독립차원의 차수
