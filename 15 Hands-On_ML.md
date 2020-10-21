@@ -656,6 +656,12 @@ $
 ---
 # 10장 신경망과 딥러닝
 
+## tenserflow
+* 고수준 미분기
+
+## 케라스
+* 모든 종류의 신경망을 손쉽게 만들고 훈련 평가, 실행할 수 있는 고수준 딥러닝 API
+
 # tensorflow 설치
 * gpu 드라이버(최신)
 * cuda(10.1)
@@ -737,9 +743,7 @@ $
     - '정확도'라는 실제적인 값이 있지만, 이를 사용하지 않고 함수를 사용하는 이유는 __미분을 통해 최적 값을 찾아낼수 있기 때문__
         + 미분(기울기)을 계산을 반복, 미분값이 0이되면 최적값     
 		
-## 케라스
-* 모든 종류의 신경망을 손쉽게 만들고 훈련 평가, 실행할 수 있는 고수준 딥러닝 API
-
+		
 # 학습 알고리즘 구현
 * Goal : 가중치와 편향을 훈련데이터에 맞게 update
     1. 데이터 입력(미니배치)
@@ -797,3 +801,53 @@ $
 *  ${\displaystyle {\frac {d(MSE)}{dW_1}}={\frac {d(MSE)}{dh_1}}\cdot {\frac {dh_1}{dz_1}} \cdot {\frac {dz_1}{dW_1}}}$
 * 결국 '__Cost function__'을 미분해서 반영하기에, '__활성화 함수__' 선택이 중요!
     - Loss function : MSE, MAE, binary/categorical/sparse categorical crossentropy 등
+	
+	
+---
+# 14장 함성곱 신경망을 사용한 컴퓨터 비전
+
+# 합성곱 신경망(CNN)
+* 시각 정보에서 -> 의미를 찾음
+    - 사람 : 1, 2, 3, 4, 5 -> 전체 모양에서 인식
+    - 기계 -> 픽셀(pixel)로 인식
+    - 기계가 인식 오류가 나는 이유
+        + 필체, 크기 -> 픽셀의 위치가 달라짐 => '위상(위치 + 상태)'이 달라짐
+
+## conv 계층
+* 입력데이터에 대한 특징을 추출
+
+## RELU 계층
+* 입력정보가 0보다 크면 그냥 내보내고, 0보다 작으면 0으로 내보냄
+
+## POOLING
+* 입력정보를 최대/최소/평균 등으로 압축하여 데이터의 연산량을 줄여줌
+    - max pooling
+    - min pooling
+    - average pooling
+	
+# Convolution 연산
+* 윈노트 이미지 참고(5.pdf)
+* 참고 : http://taewan.kim/post/cnn/
+
+### 1D Convolution
+* D : dimension  
+
+$y_0 = w_0*x_0 + w_1*x_1 + w_2*x_2 + b_1$ 
+
+$y_1 = w_0*x_1 + w_1*x_2 + w_2*x_3 + b_1$  
+...  
+$y_{N-3} = w_0*x_{N-3} + w_1*x_{N-2} + w_2*x_{N-1} + b_1$
+
+### 2D Convolution
+* 보통 컬러는 red, green, blue 이미지를 사용(채널 3개)
+* 각각의 채널을 Convolution 한 후(특징을 추출), 더함 -> 하나의 feature map 출력
+
+## convolution 계층별 역할
+* input data * kernel -> feature 추출 -> feature map -> feature map의 pooling 계층 통과 -> 이미지 축소 -> input data로 반복
+    - 위의 과정 반복
+* 예) Image -> conv -> Relu(마이너스 값을 없애기 위해 사용) -> pooling -> conv -> Relu -> pooling -> ... -> flatten(ANN) -> Softmax -> 분류
+
+* 예) 원노트 이미지 참고(5.pdf)
+
+## 개인 정리
+* CNN의 학습은 결국 필터값(가중치)의 최적의 값을 찾는 것이다.
