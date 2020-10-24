@@ -25,6 +25,7 @@
     - GAN(Generative Adversarial Network)
         + deepfake 찾아내기
         + 데이터의 차이를 보정
+		+ 장면 복원
 * 분류
     - 군집알고리즘
         + 악성코드 분류/찾기
@@ -658,6 +659,7 @@ $
 
 ## tenserflow
 * 고수준 미분기
+* 강력한 수치 계산용 라이브러리
 
 ## 케라스
 * 모든 종류의 신경망을 손쉽게 만들고 훈련 평가, 실행할 수 있는 고수준 딥러닝 API
@@ -851,3 +853,106 @@ $y_{N-3} = w_0*x_{N-3} + w_1*x_{N-2} + w_2*x_{N-1} + b_1$
 
 ## 개인 정리
 * CNN의 학습은 결국 필터값(가중치)의 최적의 값을 찾는 것이다.
+
+---
+# 15장 RNN과 CNN을 사용해 시퀀스 처리하기
+
+# 네트워크 순환 신경망(RNN)
+
+* '예측'할 때 사용
+    - 가변적인 시퀀스(Sequential) 데이터 사용
+    - 은닉층에 순환 엣지를 부여하여 가변 길이 수용
+    - 예측한 값으로 예측할수록 부정확해짐  
+
+* 활성화 함수 : tanh(기본값)
+    - 예측할 수록 부정확해짐
+    
+* 미분손실 발생(예측할 수록 부정확해짐)
+    * __LSTM__ : 기울기 소실문제 해결을 위해 고속도로 생성
+
+* Sequential Data
+    - 주가
+    - 운정
+    - 목소리(성조)
+    - 동영상
+    - 문장
+    - 심전도 -> 건강 확인
+* Time Series Data
+    1. Datametrics
+        + 입력(input) -> 출력(output)
+        + 점화식
+    2. stochastic(확률적)
+        + 이전 결과 + 확률 = 미래
+        + 확률(평균, 분산)을 통해 미시간 결과에 영향
+        
+## Markov Process
+* $사건 q_t가 일어난 경우의 수 {S_1, S_2, ..., S_N}$
+* $p(q_0, q_1, q_2, q_3, ..., q_t$
+    - = $p(q_0) * p(q_0|q_1) * p(q_2|q_1, q_0) * ... * p(q_t|q_{t-1}, ..., q_0)$
+    - 원노트 이미지 참고 : rnn.pdf
+* 예)
+    - 오민엽의 저녁메뉴
+    - 칼국수 -> 순대국밥 -> 국수 -> 김치찌개 -> 햄버거 -> ?
+    - 원노트 이미지 참고 : rnn.pdf
+
+## Hidden Markov 모델
+* 과거의 무언가에 의해 결정되는 모델
+
+## Kalman Filter
+* 측정 -> 예측
+* 원노트 이미지 참고 : rnn.pdf
+* 사용하기위한 조건
+    1. linear 모델
+    2. 측정 결과 -> '정규분포'의 형태일 때 가능
+    
+## Kalman Filter + 인과 관계 => RNN
+
+### Sequence Data의 표현법
+* (0.1, 0.2, 0.3, 0.4, 0.5, 0.6)
+* 3개씩 묶는다.
+    - (0.1, 0.2, 0.3), (0.2, 0.3, 0.4), (0.3, 0.4, 0.5)
+
+---
+# Object Detection 기법
+
+## Selective Search(SS)
+* 빠른 Detecion과 높은 Recall 예측 성능을 동시에 만족하는 알고리즘
+
+## 주요 용어 정리
+* Ground-Truth box
+    - Ground-Truth : 모델이 실제 예측하기 원하는 값(정답)
+
+* Anchor Box ?
+
+* IoU
+    - 모델이 예측한 결과와 Ground Truth box가 얼마나 정확하게 겹치는가를 나타내는 수치
+    - $IoU = {Box가 서로 겹치는 영역 \over 전체 Box의 합집합 영역}$
+    - IoU 값이 1에 가까울수록 정답, 0이면 전혀 같지 않음
+
+* NMS(Non Max Suppression
+    - 가장 확실한 Bounding Box를 제외하고 나머지 Bounding Box를 제거해주는 기능
+    - Max 값을 제외하고 나머지 값들을 Suppresion 해주는 기능
+    - __'Confidence Threshold(기준 신뢰도)'__ 값 이하의 IoU 값을 갖는 Boundig Box를 제거함
+    - 참고 : Computer_Vision_and_NN.pdf
+* Confidence Threshold(기준 신뢰도)
+    - 값의 변화에 따라 정밀도-재현율은 변화한다.
+        + 값이 낮을수록 : 정밀도는 낮아지고 재현율은 높아짐
+        + 값이 높은면 : 정밀도는 놓아지고 재현율은 낮아짐
+
+* mAP(mean Average Precision)
+    - Object detction에서 모델의 성능(정확도)을 측정하는 지표
+    - 재현율(Recall)과 정밀도(Presion)의 값을 평균화한 성능 수치
+    - mAP가 높을수록 정확하고, 작을수록 부정확
+
+* Confusion Matrix(오차행렬)
+    - 참고 : 15 Hands-On_ML.md
+    - 참고 :  핸즈온 머신러닝_3장.ipynb
+    
+## Object Detection의 목표
+* 서로 다른 크기의 Object를 Detect
+* Detection 시간의 최소화
+* Image 상에서 필요한 Object 추출
+    - 이미지에서 '배경'과 필요한 Object의 경계가 모호함
+* Data Set의 부족
+    - 훈련 가능한 데이터 Set을 수집하기 어려움
+    - 저작권, 개인정보 등의 이유로
