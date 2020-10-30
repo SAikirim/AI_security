@@ -333,11 +333,14 @@ from sklearn.metrics import confusion_matrix
 * 열 : 예측 Class(predict)
 * TP(True Positive), FP(False Positive), FN(False Negative), TN(True Negative)
 
+* 정확성(Accuracy)
+	- True Predictions / Total predictions
+	
 * 정밀도(Precision)
     - 모델이 True라고 예측한 것 중에서 실제 True인 것에 대한 비율
     - TP(True Positive) / TP + FP(False Positive)
     - 예) 맑다고 예측했는데 실제 맑은날 비율
-
+	
 * 재현율(Recall)
     - 실제 T 모델이 T라고 예측하것의 비율
     - TP / TP + FN(False Negative)
@@ -542,7 +545,7 @@ $
 2. 미분이 순간속력을 구하는 거고, 미분은 방향(-/+)을 가지고 있는게 맞나요?
   - 미분 : 순간적인 변화
   - yes
-3. 구하는 $\beta$는 '기울기'와 '절편'을 뜻하는가?
+3. 구하는 $\beta$(가중치)는 '기울기'와 '절편'을 뜻하는가?
   - yes
 4. cost function이 MSE와 같다고 할수 있나요?
   - MSE 는 Cost Function의 한 종류 입니다
@@ -956,3 +959,66 @@ $y_{N-3} = w_0*x_{N-3} + w_1*x_{N-2} + w_2*x_{N-1} + b_1$
 * Data Set의 부족
     - 훈련 가능한 데이터 Set을 수집하기 어려움
     - 저작권, 개인정보 등의 이유로
+	
+---
+# RCNN
+* 참고 : Computer_Vision_and_RCNN.pdf
+
+---
+# AI 공부
+1. youtube
+2. kaggle
+3. 유료 강의
+	- udemy
+	- http://www.kocw.net/home/index.do
+	
+---
+# Autoencoder
+* 지도학습 : 정답이 있고 정답에 맞게끔 학습
+* 비지도 학습 : 정답 없음
+	- 차원 축소
+	- [x_1, x_2, ..., x_100] -> [x_1, x_2, ... x_5]
+	
+## Auto encoder
+* Encoding
+	- 입력되는 feature Set을 학습을 통해서 __다른 표현__으로 변환
+	- (x_1, x_2, x_3, ..., x_100) -> 학습 -> (y_1, y_2, y_3)
+
+* Decoding
+	- 새롭게 학습한 표현을 원본의 형식으로 재구성
+	- (y_1, y_2, y_3) -> 재구성(학습) -> (z_1, z_2, x_3, ..., z_100)
+	
+* 특징
+	- 입력의 shape과 출력의 shape이 같다.
+	- 가운데 신경 노드의 수가 입력보다 작다.
+		+ 데이터를 압축함
+		+ 차원을 축소한다.
+		+ feature를 요약, 필요한 값들로 정리
+	- 입력 -> encoding -> 차원 축소 -> decoding -> 츨력
+	- 참고 : 원노트 이미지(autoencoder.pdf)
+	
+#### 동작
+* 학습원리 : input data를 output data로 학습시킨다.
+	- 가장쉬운 방법
+		+ 1:1 매칭
+		+ 100% 복원이 되지만 -> 차원이 줄어들지 않음 (의미 없음)
+
+* 차원 축소 방식 차용
+	- 6개의 input data의 정보를 유지 -> key가 되는 정보들만 뽑아준다.
+	-  손실함수 : 입력값과 출력값의 차이
+		+ E [(X - g(f(X)))^2]
+	- 참고 : 원노트 이미지(autoencoder.pdf)
+	
+# GAN
+* 데이터를 학습시킴 -> '확률분포'를 학습함 -> 학습하는 대상이 어떤 분포를 갖고 있는지를 학습한다.
+	- 새로운 데이터로 학습시?
+		+ 학습된 원본이미지의 확률분포를 참고 -> 새로운 이미지 생성
+* 데이터의 각 요소(특징)들을 학률분포로 만듦
+* 정규분포도를 기본으로 학습시킨다.
+
+* 예측 방식 : Game 이론
+	- 질문 -> 사람 -> 1번이라 답함
+	- 질문 -> 인공지능 -> 2번이라 답함
+	- 사람과 인공지능의 답이 같아지도록 함
+	
+* GN(생성자) -> 생성, DN(판별자) -> 필터
