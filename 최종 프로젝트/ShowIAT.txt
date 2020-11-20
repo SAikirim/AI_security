@@ -1,0 +1,28 @@
+void ShowIAT (int PID) { 
+	node *s;
+	int i=0;
+
+	while(i!=Top)
+	{
+		s = Stack[i]->next;        // head->next가 연결리스트의 첫 node
+		if(Stack[i]->PID==PID)
+		{
+			_stprintf(a, _T("PID : %d"), Stack[i]->PID);
+
+			MessageBox(NULL, a, _T("PID"), MB_OK);
+
+			while (s != Stack[i+1])  // 찾는 key가 맞거나 tail이면 끝
+			{   
+				_stprintf(a, _T("%x"), s->key);
+				nLen = GetWindowTextLength(g_hEdit3);
+				SendMessage(g_hEdit3, EM_SETSEL, nLen, nLen);
+				SendMessage(g_hEdit3, EM_REPLACESEL, FALSE, (LPARAM)a);
+				SendMessage(g_hEdit3, EM_REPLACESEL, FALSE, (LPARAM)_T("\n"));
+
+				s = s->next;         // 다음 node로
+			}
+			break;
+		}
+		i+=2;
+	}
+}

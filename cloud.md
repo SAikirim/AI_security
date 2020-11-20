@@ -10,14 +10,43 @@
 ---
 ## 클라우드
 * 필요한 만큼 자원을 클라우드 제공자에게 빌림
+
 * 물리적 서버를 구입하는 대신, 클라우드 공급자로부터 필요한 컴퓨팅 파워, 스토리지, 데이터베이스 등을 빌려와 사용함
+
+#### 레거시 환경
+* 접근 통제
+	- 네트워크 
+		+ Frewall, IDS, IPS
+		+ NAC
+		+ 외부 접근 통제 VPN
+		+ 응용프로그램 : WEB Firewall
+		+ 통합관리 : SIEM, DLP
+		+ PMS, ESM
+#### 클라우드 환경
+* SDN(Router, Switch), NFV(Firewall, Web Firewall, IPS, VPN)
+* 밴더사가 클라우드 구성을 할때부터 API 지원을 설계해두었다.
+	
+	- 이 말은 기본적으로 클라우드 밴더사는 인스턴스에 대한 모니터링을 기본 환경으로 출발하고 있다는 것을 말함	
+* __보안의 기본은 모니터링__
+	
+	- 주로 Network Rule, Security Rule를 모니터링
+* NAT, DMZ, HA(LB), BACK TO BACK 설정 가능
+
+    
+### Zero Trust
+* client -> gateway |-> 내부
+* Network Rule Setting -> accept(원래는 허용)	ALLOW X(믿지 말고 허용X)
+	- Network Rule -> 1 Security Rule ->2	보안통제
 
 ### 클라우드의 종류
 
 #### 서비스 수준
 * IaaS (Infrastructure as a Service)
+    * OPENSTACK, AWS
 * PaaS (Platform as a Service)
+    * AWS, GCP
 * SaaS (Sofrware as a Service)
+    * 저장공간을 소프트웨어로 쿼터해서 서비스 함
 
 #### 서비스 수준
 * 퍼블릭 클라우드
@@ -27,6 +56,13 @@
 * 범용 클라우드
 * 전용 클라우드
     - 주식 전용, 천문 계산 전용
+
+### 정부는 클라우드를 사용하는가?
+* Private Cloud 사용
+
+### 금융권의 클라우드
+* 데이터 분류가 필수
+* 분류가 끝난 데이터의 접근통제가 금융권의 클라우드화의 현재 가장 큰 숙제
 
 ---
 ## AWS

@@ -1,0 +1,5 @@
+C:\Users\SAiki\Desktop\vol>vol.exe -f stuxnet.vmem imageinfo
+
+C:\Users\SAiki\Desktop\vol>vol.exe -f stuxnet.vmem --profile=WinXPSP2x86 pslist
+
+C:\Users\SAiki\Desktop\vol>vol.exe -f stuxnet.vmem --profile=WinXPSP2x86 -p 868 malfind -D output
